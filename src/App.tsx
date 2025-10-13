@@ -1,25 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Sidebar } from './components/sidebar/Sidebar';
+import { Editor } from './components/Editor';
+import { useStore } from './store/useStore';
+import { useEffect } from 'react';
 
 function App() {
+  const { workspaces, createPage } = useStore();
+
+  useEffect(() => {
+    if (workspaces.length === 0) {
+      createPage('default', {
+        title: 'Welcome to Notion Clone',
+        icon: '📝',
+        blocks: [
+          {
+            id: crypto.randomUUID(),
+            type: 'text' as const,
+            content: 'This is a simple text block. Click to edit!',
+            children: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            id: crypto.randomUUID(),
+            type: 'heading' as const,
+            content: 'This is a heading',
+            children: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+    }
+  }, [workspaces.length, createPage]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="flex h-screen bg-white">
+        <Sidebar />
+        <Routes>
+          <Route path="/" element={<Editor />} />
+          <Route path="/page/:pageId" element={<Editor />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
