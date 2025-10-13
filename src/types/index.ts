@@ -1,6 +1,6 @@
 export interface Block {
   id: string;
-  type: 'text' | 'heading' | 'todo' | 'code' | 'quote' | 'ai';
+  type: 'text' | 'heading' | 'todo' | 'code' | 'quote';
   content: string;
   children: Block[];
   createdAt: Date;
