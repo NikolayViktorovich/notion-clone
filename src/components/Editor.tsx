@@ -11,6 +11,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { TodoBlock } from './blocks/TodoBlock';
 import { AdvancedCodeBlock } from './blocks/AdvancedCodeBlock';
 import { QuoteBlock } from './blocks/QuoteBlock';
+import { UndoRedo } from './ui/UndoRedo';
 
 export const Editor = () => {
   const { currentPage, updatePage, createBlock, moveBlock } = useStore();
@@ -75,10 +76,10 @@ export const Editor = () => {
 
     const contentMap = {
       text: '',
-      heading: 'New Heading',
-      todo: 'Todo item',
-      code: '// Your code here',
-      quote: 'Your quote here'
+      heading: 'Новый заголовок',
+      todo: 'To Do',
+      code: '// Вставьте свой код сюда',
+      quote: 'Цитата'
     };
 
     createBlock(currentPage.id, {
@@ -128,11 +129,11 @@ export const Editor = () => {
   };
 
   const blockTypes = [
-    { type: 'text' as const, icon: Type, label: 'Text', color: 'text-gray-600' },
-    { type: 'heading' as const, icon: Heading1, label: 'Heading', color: 'text-gray-600' },
-    { type: 'todo' as const, icon: List, label: 'Todo', color: 'text-gray-600' },
-    { type: 'code' as const, icon: Code, label: 'Code', color: 'text-gray-600' },
-    { type: 'quote' as const, icon: Quote, label: 'Quote', color: 'text-gray-600' },
+    { type: 'text' as const, icon: Type, label: 'Текст', color: 'text-gray-600' },
+    { type: 'heading' as const, icon: Heading1, label: 'Заголовок', color: 'text-gray-600' },
+    { type: 'todo' as const, icon: List, label: 'To Do', color: 'text-gray-600' },
+    { type: 'code' as const, icon: Code, label: 'Код', color: 'text-gray-600' },
+    { type: 'quote' as const, icon: Quote, label: 'Цитата', color: 'text-gray-600' },
   ];
 
   if (!currentPage) {
@@ -147,10 +148,10 @@ export const Editor = () => {
             <Plus className="w-8 h-8 text-gray-400" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            No page selected
+            Страница не выбрана
           </h2>
           <p className="text-gray-500">
-            Select a page from the sidebar or create a new one
+            Выберите страницу на боковой панели или создайте новую
           </p>
         </motion.div>
       </div>
@@ -167,17 +168,17 @@ export const Editor = () => {
       <div className="max-w-4xl mx-auto px-8 py-12">
         {/* Header Actions */}
         <div className="flex justify-between items-center mb-8">
-          <div></div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleExportPage}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm"
-          >
-            <Download className="w-4 h-4" />
-            Export Page
-          </motion.button>
-        </div>
+  <UndoRedo />
+  <motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={handleExportPage}
+    className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm"
+  >
+    <Download className="w-4 h-4" />
+    Экспорт страницы
+  </motion.button>
+</div>
 
         {/* Page Cover */}
         {currentPage.cover && (
@@ -281,7 +282,7 @@ export const Editor = () => {
               className="w-full p-6 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-all flex items-center justify-center gap-3 hover:bg-gray-50"
             >
               <Plus className="w-5 h-5" />
-              <span className="font-medium">Add a block</span>
+              <span className="font-medium">Добавить блок</span>
             </motion.button>
           )}
         </div>
@@ -300,10 +301,10 @@ export const Editor = () => {
                 onClick={() => setShowBlockMenu(true)}
                 className="px-8 py-4 bg-black text-white rounded-xl text-base font-medium hover:bg-gray-800 transition-colors shadow-sm"
               >
-                + Create your first block
+                + Создайте свой первый блок
               </motion.button>
             </div>
-            <p className="text-gray-500 text-sm">Start building your page with content blocks</p>
+            <p className="text-gray-500 text-sm">Начните создавать свою страницу с помощью блоков контента</p>
           </motion.div>
         )}
       </div>

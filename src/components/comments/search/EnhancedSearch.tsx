@@ -1,0 +1,174 @@
+// src/components/search/EnhancedSearch.tsx
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, FileText, ArrowRight, X } from 'lucide-react';
+import { useStore } from '../../../store/useStore';
+
+interface SearchMatch {
+  text: string;
+  start: number;
+  end: number;
+}
+
+interface SearchResult {
+  pageId: string;
+  pageTitle: string;
+  blockId: string;
+  blockType: string;
+  content: string;
+  matches: SearchMatch[];
+}
+
+export const EnhancedSearch = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const { searchContent, setCurrentPage } = useStore();
+  
+  const results = useMemo(() => {
+    return searchContent(query);
+  }, [query, searchContent]);
+
+  const handleResultClick = (pageId: string) => {
+    setCurrentPage(pageId);
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  const highlightText = (text: string, matches: SearchMatch[]) => {
+    if (!matches.length) return text;
+    
+    const elements: React.ReactNode[] = [];
+    let lastIndex = 0;
+    
+    matches.forEach((match, index) => {
+      // Текст до совпадения
+      if (match.start > lastIndex) {
+        elements.push(
+          <span key={`before-${index}`}>
+            {text.substring(lastIndex, match.start)}
+          </span>
+        );
+      }
+      
+      // Подсвеченное совпадение
+      elements.push(
+        <mark key={`match-${index}`} className="bg-yellow-200 px-1 rounded">
+          {text.substring(match.start, match.end)}
+        </mark>
+      );
+      
+      lastIndex = match.end;
+    });
+    
+    // Текст после последнего совпадения
+    if (lastIndex < text.length) {
+      elements.push(
+        <span key="after">
+          {text.substring(lastIndex)}
+        </span>
+      );
+    }
+    
+    return elements;
+  };
+
+  return (
+    <>
+      {/* Кнопка поиска */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm text-gray-700"
+      >
+        <Search className="w-4 h-4" />
+        <span>Поиск...</span>
+        <kbd className="text-xs bg-white border border-gray-300 rounded px-1.5 py-0.5">Ctrl+K</kbd>
+      </button>
+
+      {/* Модальное окно поиска */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-20"
+            onClick={() => setIsOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Поле поиска */}
+              <div className="relative p-4 border-b border-gray-200">
+                <Search className="w-5 h-5 absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Поиск по всем страницам и блокам..."
+                  className="w-full pl-12 pr-10 py-3 border-0 focus:ring-0 text-lg placeholder-gray-400"
+                  autoFocus
+                />
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="absolute right-6 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Результаты */}
+              <div className="max-h-96 overflow-y-auto">
+                {query && results.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Ничего не найдено</p>
+                    <p className="text-sm mt-1">Попробуйте изменить запрос</p>
+                  </div>
+                ) : results.length > 0 ? (
+                  <div className="p-2">
+                    <div className="px-3 py-2 text-xs font-medium text-gray-500">
+                      Найдено {results.length} результатов
+                    </div>
+                    {results.map((result, index) => (
+                      <motion.div
+                        key={`${result.pageId}-${result.blockId}-${index}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        onClick={() => handleResultClick(result.pageId)}
+                        className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group"
+                      >
+                        <FileText className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {result.pageTitle}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {highlightText(result.content, result.matches)}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1 capitalize">
+                            {result.blockType} блок
+                          </p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Начните вводить запрос для поиска</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};

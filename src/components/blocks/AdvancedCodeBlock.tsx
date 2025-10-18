@@ -624,7 +624,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Code Templates */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Code Templates</h4>
+              <h4 className="text-sm font-medium text-gray-900 mb-2">Шаблоны темплейтов</h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {codeTemplates.map((template, index) => (
                   <button
@@ -643,7 +643,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
 
             {/* Supported Modules */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Supported Modules</h4>
+              <h4 className="text-sm font-medium text-gray-900 mb-2">Поддерживающиеся модули</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {supportedModules.map((module) => (
                   <div key={module.name} className="flex items-center justify-between text-xs p-2 hover:bg-gray-100 rounded">
@@ -685,7 +685,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
       {/* Loaded Modules Indicator */}
       {loadedModules.length > 0 && (
         <div className="mt-2 flex items-center gap-2 text-xs text-gray-600">
-          <span>Loaded modules:</span>
+          <span>Загруженные модули:</span>
           <div className="flex gap-1">
             {loadedModules.map(module => (
               <span key={module} className="bg-green-100 text-green-800 px-2 py-1 rounded">
@@ -737,7 +737,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
       {/* Quick Tips */}
       {!isEditing && (
         <div className="mt-2 text-xs text-gray-500">
-        Tip: Use <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+Enter</kbd> to run code, <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Tab</kbd> for indentation
+        Напоминание: Используйте <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+Enter</kbd> для выполнения кода, <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Tab</kbd> для отступа
         </div>
       )}
     </motion.div>

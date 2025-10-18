@@ -45,7 +45,7 @@ export const SortableBlock = ({ block, children, index }: SortableBlockProps) =>
       ? block.content.substring(0, 50) + '...' 
       : block.content;
     
-    return `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}: ${content || 'Empty block'}`;
+    return `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}: ${content || 'Пустой блок'}`;
   };
 
   return (
@@ -99,9 +99,9 @@ export const SortableBlock = ({ block, children, index }: SortableBlockProps) =>
         isOpen={deleteModal}
         onClose={() => setDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Block"
-        description={`Are you sure you want to delete this block? "${getBlockPreview()}"`}
-        confirmText="Delete Block"
+        title="Удалить блок"
+        description={`Вы уверены что хотите удалить блок "${getBlockPreview()}"?`}
+        confirmText="Удалить"
         type="delete"
       />
     </>

@@ -5,20 +5,37 @@ import { useStore } from './store/useStore';
 import { useEffect } from 'react';
 import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
 import { useState } from 'react';
+import { useTheme } from './hooks/useTheme';
+import { ThemeToggle } from './components/theme/ThemeToggle';
+import { EnhancedSearch } from './components/comments/search/EnhancedSearch';
+import { UndoRedo } from './components/ui/UndoRedo';
 
 function App() {
-  const { workspaces, createPage } = useStore();
+  const { workspaces, createPage, currentPage } = useStore();
+  const { currentTheme, themes } = useTheme();
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Применяем тему при загрузке и изменении
   useEffect(() => {
-    if (workspaces.length === 0) {
+    const theme = themes.find(t => t.id === currentTheme);
+    if (theme) {
+      const root = document.documentElement;
+      Object.entries(theme.colors).forEach(([key, value]) => {
+        root.style.setProperty(`--color-${key}`, value);
+      });
+      root.setAttribute('data-theme', theme.type);
+    }
+  }, [currentTheme, themes]);
+
+  useEffect(() => {
+    if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
       createPage('default', {
         title: 'Welcome to Notion Clone',
         icon: '📝',
         blocks: [
           {
             id: crypto.randomUUID(),
-            type: 'text' as const,
+            type: 'text',
             content: 'This is a simple text block. Click to edit!',
             children: [],
             createdAt: new Date(),
@@ -26,7 +43,7 @@ function App() {
           },
           {
             id: crypto.randomUUID(),
-            type: 'heading' as const,
+            type: 'heading',
             content: 'This is a heading',
             children: [],
             createdAt: new Date(),
@@ -57,18 +74,55 @@ function App() {
       onDragEnd={handleDragEnd}
     >
       <Router>
-        <div className="flex h-screen bg-white">
+        <div className="flex h-screen bg-background">
           <Sidebar />
-          <Routes>
-            <Route path="/" element={<Editor />} />
-            <Route path="/page/:pageId" element={<Editor />} />
-          </Routes>
+          
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col">
+            {/* Top Bar */}
+            <div className="flex items-center justify-between p-4 border-b border-border bg-background">
+              <div className="flex items-center gap-4">
+                {/* Enhanced Search in Top Bar */}
+                <EnhancedSearch />
+                
+                {/* Page Title */}
+                {currentPage && (
+                  <h1 className="text-xl font-semibold text-text">
+                    {currentPage.title}
+                  </h1>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {/* Theme Toggle */}
+                <ThemeToggle />
+                
+                {/* Undo/Redo Controls */}
+                <UndoRedo />
+              </div>
+            </div>
+
+            {/* Editor Area */}
+            <div className="flex-1 overflow-auto">
+              <Routes>
+                <Route path="/" element={<Editor />} />
+                <Route path="/page/:pageId" element={<Editor />} />
+              </Routes>
+            </div>
+          </div>
         </div>
       </Router>
       
       <DragOverlay>
         {activeId ? (
-          <div className="opacity-50 bg-white border border-gray-300 rounded-lg p-4 shadow-lg">
+          <div 
+            className="opacity-50 rounded-lg p-4 shadow-lg border"
+            style={{
+              backgroundColor: 'var(--color-background)',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-text)'
+            }}
+          >
             Dragging block...
           </div>
         ) : null}

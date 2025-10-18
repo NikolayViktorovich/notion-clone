@@ -56,14 +56,14 @@ export const TextBlock = ({ block }: TextBlockProps) => {
           onKeyDown={handleKeyDown}
           className="w-full resize-none border-none outline-none text-lg leading-relaxed bg-transparent"
           style={{ minHeight: '1.5em' }}
-          placeholder="Type something..."
+          placeholder="Напишите что-нибудь..."
         />
       ) : (
         <div
           onClick={() => setIsEditing(true)}
           className="cursor-text hover:bg-gray-50 rounded px-2 py-1 -mx-2 text-lg leading-relaxed whitespace-pre-wrap min-h-[1.5em]"
         >
-          {content || <span className="text-gray-400">Empty text block...</span>}
+          {content || <span className="text-gray-400">Пустой текстовый блок...</span>}
         </div>
       )}
     </motion.div>

@@ -18,8 +18,8 @@ export const Modal = ({
   onConfirm,
   title,
   description,
-  confirmText = 'Delete',
-  cancelText = 'Cancel',
+  confirmText = 'Удалить',
+  cancelText = 'Отмена',
   type = 'delete'
 }: ModalProps) => {
   const handleBackdropClick = (e: React.MouseEvent) => {
