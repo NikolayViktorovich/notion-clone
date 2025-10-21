@@ -544,7 +544,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
 
   return (
     <BaseBlock>
-      {/* Заголовок с языком и действиями */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <CodeIcon className="w-4 h-4 text-text-secondary flex-shrink-0" />
@@ -559,7 +558,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </div>
 
         <div className="flex items-center gap-1">
-          {/* Кнопка настроек */}
           <button
             onClick={() => setShowSettings(!showSettings)}
             className={`p-1 rounded transition-colors ${
@@ -570,7 +568,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
             <Settings className="w-4 h-4 text-text" />
           </button>
 
-          {/* Кнопки действий */}
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={copyToClipboard}
@@ -609,7 +606,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </div>
       </div>
 
-      {/* Панель шаблонов и настроек */}
       {showSettings && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -636,7 +632,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
               </div>
             </div>
 
-            {/* Поддерживаемые модули */}
             <div>
               <h4 className="text-sm font-medium text-text mb-2">Поддерживающиеся модули</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
@@ -686,8 +681,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           </div>
         </div>
       )}
-
-      {/* Панель вывода */}
       {output && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -717,7 +710,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </motion.div>
       )}
 
-      {/* Статус выполнения */}
       {isRunning && (
         <div className="mt-2 flex items-center gap-2 text-sm text-blue-600">
           <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -725,7 +717,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </div>
       )}
 
-      {/* Краткие советы */}
       {!isEditing && (
         <div className="mt-2 text-xs text-text-secondary">
           Напоминание: Используйте <kbd className="px-1 py-0.5 bg-hover rounded text-xs">Ctrl+Enter</kbd> для выполнения кода, <kbd className="px-1 py-0.5 bg-hover rounded text-xs">Tab</kbd> для отступа

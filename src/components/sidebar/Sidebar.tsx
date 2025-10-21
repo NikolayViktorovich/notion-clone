@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Plus, Search, FileText, Trash2, MoreVertical, Download, LayoutTemplate, X } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { useState, useRef, useEffect } from 'react';

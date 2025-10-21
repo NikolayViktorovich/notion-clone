@@ -25,8 +25,7 @@ function App() {
     if (theme) {
       applyThemeToDocument(theme);
     }
-  }, [currentTheme, themes, workspaces]);
-  
+  }, [currentTheme, themes]);
 
   useEffect(() => {
     initializeOffline();
@@ -54,7 +53,7 @@ function App() {
         ],
       });
     }
-  }, [workspaces.length, createPage, initializeOffline]);
+  }, [workspaces, createPage, initializeOffline]); // Добавил workspaces в зависимости
 
   const handleAppLoad = () => {
     setAppLoaded(true);
