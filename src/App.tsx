@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './components/sidebar/Sidebar';
 import { Editor } from './components/Editor';
 import { useStore } from './store/useStore';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { ThemeToggle } from './components/theme/ThemeToggle';
 import { EnhancedSearch } from './components/comments/search/EnhancedSearch';
