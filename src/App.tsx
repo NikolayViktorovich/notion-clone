@@ -20,41 +20,38 @@ function App() {
   const [appLoaded, setAppLoaded] = useState(false);
   const [themeKey, setThemeKey] = useState(0);
 
-  const initializeApp = useCallback(() => {
-    const theme = themes.find(t => t.id === currentTheme);
-    if (theme) {
-      applyThemeToDocument(theme);
-      setThemeKey(prev => prev + 1);
-    }
-    initializeOffline();
-    if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
-      createPage('default', {
-        title: 'Welcome to Notion Clone',
-        blocks: [
-          {
-            id: crypto.randomUUID(),
-            type: 'text',
-            content: 'This is a simple text block. Click to edit!',
-            children: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: crypto.randomUUID(),
-            type: 'heading',
-            content: 'This is a heading',
-            children: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      });
-    }
-  }, [currentTheme, themes, initializeOffline, workspaces, createPage]);
-
 useEffect(() => {
-  initializeApp();
-}, [initializeApp]);
+  const theme = themes.find(t => t.id === currentTheme);
+  if (theme) {
+    applyThemeToDocument(theme);
+    setThemeKey(prev => prev + 1);
+  }
+  initializeOffline();
+  if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
+    createPage('default', {
+      title: 'Welcome to Notion Clone',
+      blocks: [
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: 'This is a simple text block. Click to edit!',
+          children: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: crypto.randomUUID(),
+          type: 'heading',
+          content: 'This is a heading',
+          children: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [currentTheme]);
 
   if (!appLoaded) {
     return <Loading onLoadComplete={() => setAppLoaded(true)} />;
