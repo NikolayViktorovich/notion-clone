@@ -20,40 +20,42 @@ function App() {
   const [appLoaded, setAppLoaded] = useState(false);
   const [themeKey, setThemeKey] = useState(0);
 
-  useEffect(() => {
+useEffect(() => {
   const theme = themes.find(t => t.id === currentTheme);
   if (theme) {
     applyThemeToDocument(theme);
     setThemeKey(prev => prev + 1);
   }
   initializeOffline();
-  if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
-    createPage('default', {
-      title: 'Welcome to Notion Clone',
-      blocks: [
-        {
-          id: crypto.randomUUID(),
-          type: 'text',
-          content: 'This is a simple text block. Click to edit!',
-          children: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: crypto.randomUUID(),
-          type: 'heading',
-          content: 'This is a heading',
-          children: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
-    });
-  }
-}, [currentTheme, themes]);
+}, [currentTheme, initializeOffline, themes]);
+
+    useEffect(() => {
+      if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
+        createPage('default', {
+          title: 'Добро пожаловать в Notion Clone',
+          blocks: [
+            {
+              id: crypto.randomUUID(),
+              type: 'text',
+              content: 'Это простой текстовый блок. Нажмите, чтобы редактировать!',
+              children: [],
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+            {
+              id: crypto.randomUUID(),
+              type: 'heading',
+              content: 'Это заголовок',
+              children: [],
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ],
+        });
+      }
+    }, [workspaces, createPage]);
 
   if (!appLoaded) {
-    // Если приложение ещё не загружено — показываем лоадер
     return <Loading onLoadComplete={() => setAppLoaded(true)} />;
   }
 
