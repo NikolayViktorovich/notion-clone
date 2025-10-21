@@ -4,7 +4,7 @@ import { TextBlock } from './blocks/TextBlock';
 import { HeaderBlock } from './blocks/HeaderBlock';
 import { SortableBlock } from './blocks/SortableBlock';
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Type, Heading1, List, Code, Quote, Download, ChevronLeft, Menu } from 'lucide-react';
+import { Plus, Type, Heading1, List, Code, Quote, Download } from 'lucide-react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable, DndContext, DragEndEvent, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import { TodoBlock } from './blocks/TodoBlock';
@@ -12,9 +12,7 @@ import { AdvancedCodeBlock } from './blocks/AdvancedCodeBlock';
 import { QuoteBlock } from './blocks/QuoteBlock';
 import { formatDate } from '../utils/dateUtils';
 import { GoogleDriveManager } from './google/GoogleDriveManager';
-import { useNavigate } from 'react-router-dom';
 import { Modal } from './ui/Modal';
-import { useStore as useAppStore } from '../store/useStore';
 import { UndoRedo } from './ui/UndoRedo';
 
 export const Editor = () => {
@@ -25,7 +23,6 @@ export const Editor = () => {
     moveBlock, 
     deleteBlock 
   } = useStore();
-  const { sidebarOpen, setSidebarOpen } = useAppStore();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [title, setTitle] = useState('');
   const [showBlockMenu, setShowBlockMenu] = useState(false);
@@ -42,7 +39,6 @@ export const Editor = () => {
   
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const blockMenuRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   
   const [blockCount, setBlockCount] = useState(0);
   const [previousPageId, setPreviousPageId] = useState<string | null>(null);
@@ -62,7 +58,7 @@ export const Editor = () => {
         setBlockCount(currentPage.blocks.length);
       }
     }
-  }, [currentPage]);
+  }, [currentPage, previousPageId]);
 
   useEffect(() => {
     if (isEditingTitle && titleRef.current) {

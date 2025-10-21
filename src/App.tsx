@@ -14,7 +14,7 @@ import { OfflineStatus } from './components/ui/OfflineStatus';
 import { Menu } from 'lucide-react';
 
 function App() {
-  const { workspaces, createPage, currentPage, sidebarOpen, setSidebarOpen, initializeOffline } = useStore();
+  const { workspaces, createPage, sidebarOpen, setSidebarOpen, initializeOffline } = useStore();
   const { currentTheme, themes } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [appLoaded, setAppLoaded] = useState(false);
