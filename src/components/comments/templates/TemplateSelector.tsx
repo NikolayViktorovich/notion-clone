@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutTemplate, X, Search } from 'lucide-react';
 import { useStore } from '../../../store/useStore';
 import { PageTemplate } from '../../../types';
-import { useTheme } from '../../../hooks/useTheme';
 
 interface TemplateSelectorProps {
   isOpen: boolean;

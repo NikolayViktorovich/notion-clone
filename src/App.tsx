@@ -20,7 +20,7 @@ function App() {
   const [appLoaded, setAppLoaded] = useState(false);
   const [themeKey, setThemeKey] = useState(0);
 
-useEffect(() => {
+  useEffect(() => {
   const theme = themes.find(t => t.id === currentTheme);
   if (theme) {
     applyThemeToDocument(theme);
@@ -50,7 +50,7 @@ useEffect(() => {
       ],
     });
   }
-}, [currentTheme, createPage, initializeOffline, themes, workspaces]);
+}, [currentTheme, themes]);
 
   if (!appLoaded) {
     // Если приложение ещё не загружено — показываем лоадер
