@@ -1,4 +1,3 @@
-// src/components/search/EnhancedSearch.tsx
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FileText, ArrowRight, X } from 'lucide-react';
@@ -41,7 +40,6 @@ export const EnhancedSearch = () => {
     let lastIndex = 0;
     
     matches.forEach((match, index) => {
-      // Текст до совпадения
       if (match.start > lastIndex) {
         elements.push(
           <span key={`before-${index}`}>
@@ -50,7 +48,6 @@ export const EnhancedSearch = () => {
         );
       }
       
-      // Подсвеченное совпадение
       elements.push(
         <mark key={`match-${index}`} className="bg-yellow-200 px-1 rounded">
           {text.substring(match.start, match.end)}
@@ -60,7 +57,6 @@ export const EnhancedSearch = () => {
       lastIndex = match.end;
     });
     
-    // Текст после последнего совпадения
     if (lastIndex < text.length) {
       elements.push(
         <span key="after">
@@ -77,11 +73,11 @@ export const EnhancedSearch = () => {
       {/* Кнопка поиска */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm text-gray-700"
+        className="flex items-center gap-2 px-3 py-2 bg-hover hover:bg-border rounded-lg transition-colors text-sm text-text"
       >
         <Search className="w-4 h-4" />
         <span>Поиск...</span>
-        <kbd className="text-xs bg-white border border-gray-300 rounded px-1.5 py-0.5">Ctrl+K</kbd>
+        <kbd className="text-xs bg-background border border-border rounded px-1.5 py-0.5 text-text-secondary">Ctrl+K</kbd>
       </button>
 
       {/* Модальное окно поиска */}
@@ -98,39 +94,39 @@ export const EnhancedSearch = () => {
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4"
+              className="bg-background border border-border rounded-lg shadow-xl w-full max-w-2xl mx-4"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Поле поиска */}
-              <div className="relative p-4 border-b border-gray-200">
-                <Search className="w-5 h-5 absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <div className="relative p-4 border-b border-border">
+                <Search className="w-5 h-5 absolute left-6 top-1/2 transform -translate-y-1/2 text-text-secondary" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Поиск по всем страницам и блокам..."
-                  className="w-full pl-12 pr-10 py-3 border-0 focus:ring-0 text-lg placeholder-gray-400"
+                  className="w-full pl-12 pr-10 py-3 border-0 focus:ring-0 text-lg placeholder-text-secondary bg-background text-text"
                   autoFocus
                 />
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="absolute right-6 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                  className="absolute right-6 top-1/2 transform -translate-y-1/2 p-1 hover:bg-hover rounded"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-text-secondary" />
                 </button>
               </div>
 
               {/* Результаты */}
               <div className="max-h-96 overflow-y-auto">
                 {query && results.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500">
+                  <div className="p-8 text-center text-text-secondary">
                     <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>Ничего не найдено</p>
                     <p className="text-sm mt-1">Попробуйте изменить запрос</p>
                   </div>
                 ) : results.length > 0 ? (
                   <div className="p-2">
-                    <div className="px-3 py-2 text-xs font-medium text-gray-500">
+                    <div className="px-3 py-2 text-xs font-medium text-text-secondary">
                       Найдено {results.length} результатов
                     </div>
                     {results.map((result, index) => (
@@ -140,26 +136,26 @@ export const EnhancedSearch = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
                         onClick={() => handleResultClick(result.pageId)}
-                        className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group"
+                        className="flex items-start gap-3 p-3 hover:bg-hover rounded-lg cursor-pointer transition-colors group"
                       >
-                        <FileText className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                        <FileText className="w-5 h-5 text-text-secondary mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                          <p className="font-medium text-text group-hover:text-accent transition-colors">
                             {result.pageTitle}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-text mt-1">
                             {highlightText(result.content, result.matches)}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1 capitalize">
+                          <p className="text-xs text-text-secondary mt-1 capitalize">
                             {result.blockType} блок
                           </p>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-text-secondary group-hover:text-accent transition-colors flex-shrink-0" />
                       </motion.div>
                     ))}
                   </div>
                 ) : (
-                  <div className="p-8 text-center text-gray-500">
+                  <div className="p-8 text-center text-text-secondary">
                     <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>Начните вводить запрос для поиска</p>
                   </div>

@@ -1,4 +1,3 @@
-// src/components/blocks/AdvancedCodeBlock.tsx
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
@@ -14,6 +13,7 @@ import {
   Trash2,
   Settings
 } from 'lucide-react';
+import { BaseBlock } from './BaseBlock';
 
 const moduleCache = new Map();
 
@@ -91,7 +91,6 @@ const loadModule = async (moduleName: string): Promise<any> => {
 
   throw new Error(`Module ${moduleName} is not supported`);
 };
-
 
 const preloadModules = async (modules: string[]): Promise<void> => {
   await Promise.all(modules.map(module => loadModule(module).catch(() => null)));
@@ -201,7 +200,7 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
         importedModules = resolved.imports;
         setLoadedModules(importedModules);
       } catch (importError) {
-        setOutput(`📦 Import Error: ${importError}`);
+        setOutput(`Ошибка импорта: ${importError}`);
         setIsRunning(false);
         return;
       }
@@ -210,7 +209,7 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
         try {
           await preloadModules(importedModules);
         } catch (error) {
-          setOutput(`📦 Module Loading Error: ${error}`);
+          setOutput(`Ошибка загрузки модуля: ${error}`);
           setIsRunning(false);
           return;
         }
@@ -254,13 +253,13 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
               const output = args.map(arg => 
                 typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
               ).join(' ');
-              logs.push(`❌ ${output}`);
+              logs.push(`${output}`);
             },
             warn: (...args: any[]) => {
               const output = args.map(arg => 
                 typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
               ).join(' ');
-              logs.push(`⚠️ ${output}`);
+              logs.push(`${output}`);
             }
           },
           Math: Math,
@@ -289,17 +288,17 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
         setExecutionTime(endTime - startTime);
 
         if (logs.length === 0) {
-          setOutput('✅ Code executed successfully (no output)');
+          setOutput('Код выполнен успешно (нет вывода)');
         } else {
           setOutput(logs.join('\n'));
         }
       } catch (error) {
         Object.assign(console, originalConsole);
         delete (window as any).__modules__;
-        setOutput(`Runtime Error: ${error}`);
+        setOutput(`Ошибка выполнения: ${error}`);
       }
     } catch (error) {
-      setOutput(`Execution Error: ${error}`);
+      setOutput(`Ошибка выполнения: ${error}`);
     } finally {
       setIsRunning(false);
     }
@@ -307,7 +306,7 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
 
   const stopExecution = () => {
     setIsRunning(false);
-    setOutput('Execution stopped by user');
+    setOutput('Выполнение остановлено пользователем');
   };
 
   const copyToClipboard = async () => {
@@ -316,7 +315,7 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      setOutput('Failed to copy to clipboard');
+      setOutput('Ошибка копирования');
     }
   };
 
@@ -345,8 +344,8 @@ export const AdvancedCodeBlock = ({ block }: AdvancedCodeBlockProps) => {
 
   const codeTemplates = [
     {
-      name: 'Array Operations',
-      code: `// Array operations with vanilla JavaScript
+      name: 'Операции с массивами',
+      code: `// Операции с массивами в чистом JavaScript
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const evenNumbers = numbers.filter(n => n % 2 === 0);
 const squared = numbers.map(n => n * n);
@@ -358,8 +357,8 @@ console.log('Squared:', squared);
 console.log('Sum:', sum);`
     },
     {
-      name: 'Object Manipulation',
-      code: `// Object manipulation
+      name: 'Манипуляции с объектами',
+      code: `// Манипуляции с объектами
 const users = [
   { id: 1, name: 'John Doe', age: 25, active: true },
   { id: 2, name: 'Jane Smith', age: 30, active: false },
@@ -376,8 +375,8 @@ console.log('User names:', userNames);
 console.log('Average age:', averageAge);`
     },
     {
-      name: 'Async Operations',
-      code: `// Async operations with Promises
+      name: 'Асинхронные операции',
+      code: `// Асинхронные операции с Promises
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -398,8 +397,8 @@ asyncDemo().then(() => {
 });`
     },
     {
-      name: 'Simple Calculator',
-      code: `// Simple calculator functions
+      name: 'Простой калькулятор',
+      code: `// Простой калькулятор функций
 const calculator = {
   add: (a, b) => a + b,
   subtract: (a, b) => a - b,
@@ -414,8 +413,8 @@ console.log('15 / 3 =', calculator.divide(15, 3));
 console.log('5 / 0 =', calculator.divide(5, 0));`
     },
     {
-      name: 'With Lodash (CDN)',
-      code: `// Using lodash from CDN
+      name: 'С Lodash (CDN)',
+      code: `// С Lodash (CDN)
 import _ from 'lodash';
 
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -429,8 +428,8 @@ console.log('Chunked:', chunked);
 console.log('Unique:', unique);`
     },
     {
-      name: 'HTTP Requests with Axios',
-      code: `// HTTP requests with axios
+      name: 'HTTP-запросы с Axios',
+      code: `// HTTP-запросы с Axios
 import axios from 'axios';
 
 // Mock API response since we can't make real requests
@@ -447,8 +446,8 @@ console.log('Mock response:', mockUsers);
 // console.log('Real data:', response.data);`
     },
     {
-      name: 'Date Manipulation with Moment',
-      code: `// Date manipulation with moment
+      name: 'Манипулирование датой с помощью момента',
+      code: `// Манипулирование датой с помощью момента
 import moment from 'moment';
 
 const now = moment();
@@ -461,8 +460,8 @@ console.log('Formatted:', formatted);
 console.log('Difference in days:', nextWeek.diff(now, 'days'));`
     },
     {
-      name: 'Random Data with Chance',
-      code: `// Generate random data with chance
+      name: 'Случайные данные со случайностью',
+      code: `// Случайные данные со случайностью
 import Chance from 'chance';
 
 const chance = new Chance();
@@ -478,8 +477,8 @@ console.log('Random Address:', randomAddress);
 console.log('Random Birthday:', randomBirthday);`
     },
     {
-      name: 'Functional Programming with Ramda',
-      code: `// Functional programming with Ramda
+      name: 'Функциональное программирование с Ramda',
+      code: `// Функциональное программирование с Ramda
 import R from 'ramda';
 
 const numbers = [1, 2, 3, 4, 5, 6];
@@ -496,8 +495,8 @@ console.log('Even:', evenNumbers);
 console.log('Sum:', sum);`
     },
     {
-      name: 'UUID Generation',
-      code: `// UUID generation
+      name: 'UUID генерация',
+      code: `// UUID генерация
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = Math.random() * 16 | 0;
@@ -516,8 +515,8 @@ console.log('UUID 3:', id3);
 console.log('All unique?', id1 !== id2 && id2 !== id3 && id1 !== id3);`
     },
     {
-      name: 'Lightweight Dates with Day.js',
-      code: `// Lightweight date manipulation with dayjs
+      name: 'Легкие даты с Day.js',
+      code: `// Легкая манипуляция датами с помощью dayjs
 import dayjs from 'dayjs';
 
 const now = dayjs();
@@ -544,59 +543,55 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative"
-    >
-      {/* Header with language and actions */}
+    <BaseBlock>
+      {/* Заголовок с языком и действиями */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <CodeIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
-          <span className="text-xs font-mono bg-gray-100 text-gray-800 px-2 py-1 rounded border border-gray-300">
+          <CodeIcon className="w-4 h-4 text-text-secondary flex-shrink-0" />
+          <span className="text-xs font-mono bg-hover text-text px-2 py-1 rounded border border-border">
             JavaScript
           </span>
           
-          <div className="flex items-center gap-1 text-xs text-gray-500">
+          <div className="flex items-center gap-1 text-xs text-text-secondary">
             <ExternalLink className="w-3 h-3" />
             <span>CDN imports supported</span>
           </div>
         </div>
 
         <div className="flex items-center gap-1">
-          {/* Settings Button */}
+          {/* Кнопка настроек */}
           <button
             onClick={() => setShowSettings(!showSettings)}
             className={`p-1 rounded transition-colors ${
-              showSettings ? 'bg-gray-200' : 'hover:bg-gray-200'
+              showSettings ? 'bg-hover' : 'hover:bg-hover'
             }`}
             title="Templates & Settings"
           >
-            <Settings className="w-4 h-4 text-gray-600" />
+            <Settings className="w-4 h-4 text-text" />
           </button>
 
-          {/* Action Buttons */}
+          {/* Кнопки действий */}
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={copyToClipboard}
-              className="p-1 hover:bg-gray-200 rounded transition-colors"
+              className="p-1 hover:bg-hover rounded transition-colors"
               title="Copy code"
             >
-              {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-600" />}
+              {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-text" />}
             </button>
             
             <button
               onClick={downloadCode}
-              className="p-1 hover:bg-gray-200 rounded transition-colors"
+              className="p-1 hover:bg-hover rounded transition-colors"
               title="Download code"
             >
-              <Download className="w-4 h-4 text-gray-600" />
+              <Download className="w-4 h-4 text-text" />
             </button>
             
             {isRunning ? (
               <button
                 onClick={stopExecution}
-                className="p-1 hover:bg-gray-200 rounded transition-colors"
+                className="p-1 hover:bg-hover rounded transition-colors"
                 title="Stop execution"
               >
                 <Square className="w-4 h-4 text-red-600" />
@@ -604,7 +599,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
             ) : (
               <button
                 onClick={executeCode}
-                className="p-1 hover:bg-gray-200 rounded transition-colors"
+                className="p-1 hover:bg-hover rounded transition-colors"
                 title="Run code (Ctrl+Enter)"
               >
                 <Play className="w-4 h-4 text-green-600" />
@@ -614,26 +609,26 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </div>
       </div>
 
-      {/* Templates & Settings Panel */}
+      {/* Панель шаблонов и настроек */}
       {showSettings && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg"
+          className="mb-4 p-4 bg-hover border border-border rounded-lg"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Code Templates */}
+            {/* Шаблоны кода */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Шаблоны темплейтов</h4>
+              <h4 className="text-sm font-medium text-text mb-2">Шаблоны темплейтов</h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {codeTemplates.map((template, index) => (
                   <button
                     key={index}
                     onClick={() => insertTemplate(template.code)}
-                    className="w-full text-left p-2 text-xs bg-white border border-gray-200 rounded hover:border-black transition-colors"
+                    className="w-full text-left p-2 text-xs bg-background border border-border rounded hover:border-accent transition-colors"
                   >
-                    <div className="font-medium">{template.name}</div>
-                    <div className="text-gray-500 text-xs mt-1">
+                    <div className="font-medium text-text">{template.name}</div>
+                    <div className="text-text-secondary text-xs mt-1">
                       {template.code.split('\n')[0].replace('// ', '')}
                     </div>
                   </button>
@@ -641,16 +636,16 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
               </div>
             </div>
 
-            {/* Supported Modules */}
+            {/* Поддерживаемые модули */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Поддерживающиеся модули</h4>
+              <h4 className="text-sm font-medium text-text mb-2">Поддерживающиеся модули</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {supportedModules.map((module) => (
-                  <div key={module.name} className="flex items-center justify-between text-xs p-2 hover:bg-gray-100 rounded">
-                    <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                  <div key={module.name} className="flex items-center justify-between text-xs p-2 hover:bg-background rounded">
+                    <span className="font-mono bg-background text-text px-2 py-1 rounded">
                       {module.name}
                     </span>
-                    <span className="text-gray-500 text-right">{module.description}</span>
+                    <span className="text-text-secondary text-right">{module.description}</span>
                   </div>
                 ))}
               </div>
@@ -659,7 +654,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </motion.div>
       )}
 
-      {/* Code Editor */}
+      {/* Редактор кода */}
       {isEditing ? (
         <textarea
           ref={textareaRef}
@@ -667,24 +662,24 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           onChange={(e) => setContent(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-          className="w-full resize-none font-mono text-sm bg-gray-100 border border-gray-300 rounded-lg p-4 outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+          className="w-full resize-none font-mono text-sm bg-background border border-border rounded-lg p-4 outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-text placeholder-text-secondary"
           style={{ minHeight: '200px' }}
           placeholder={`// Write your JavaScript code here...\n// Use console.log() to see output\n// Press Ctrl+Enter to run\n// For CDN imports use: import _ from 'lodash';`}
         />
       ) : (
         <pre
           onClick={() => setIsEditing(true)}
-          className="cursor-text font-mono text-sm bg-gray-100 border border-gray-300 rounded-lg p-4 whitespace-pre-wrap hover:bg-gray-200 transition-colors min-h-[200px] relative"
+          className="cursor-text font-mono text-sm bg-background border border-border rounded-lg p-4 whitespace-pre-wrap hover:bg-hover transition-colors min-h-[200px] relative text-text"
         >
           <code className="language-javascript">
-            {content || <span className="text-gray-400">// Click to write code...\n// Use templates from settings for quick start</span>}
+            {content || <span className="text-text-secondary">// Click to write code...\n// Use templates from settings for quick start</span>}
           </code>
         </pre>
       )}
 
-      {/* Loaded Modules Indicator */}
+      {/* Индикатор загруженных модулей */}
       {loadedModules.length > 0 && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-gray-600">
+        <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
           <span>Загруженные модули:</span>
           <div className="flex gap-1">
             {loadedModules.map(module => (
@@ -696,50 +691,50 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </div>
       )}
 
-      {/* Output Panel */}
+      {/* Панель вывода */}
       {output && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mt-3 border border-gray-200 rounded-lg overflow-hidden"
+          className="mt-3 border border-border rounded-lg overflow-hidden"
         >
-          <div className="flex items-center justify-between bg-gray-50 px-4 py-2 border-b border-gray-200">
+          <div className="flex items-center justify-between bg-hover px-4 py-2 border-b border-border">
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-gray-700">Output</span>
+              <span className="text-sm font-medium text-text">Output</span>
               {executionTime > 0 && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-text-secondary">
                   {executionTime.toFixed(2)}ms
                 </span>
               )}
             </div>
             <button
               onClick={clearOutput}
-              className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+              className="text-xs text-text-secondary hover:text-text flex items-center gap-1"
             >
               <Trash2 className="w-3 h-3" />
               Clear
             </button>
           </div>
-          <pre className="font-mono text-sm bg-white p-4 max-h-80 overflow-y-auto whitespace-pre-wrap">
+          <pre className="font-mono text-sm bg-background p-4 max-h-80 overflow-y-auto whitespace-pre-wrap text-text">
             <code>{output}</code>
           </pre>
         </motion.div>
       )}
 
-      {/* Execution Status */}
+      {/* Статус выполнения */}
       {isRunning && (
         <div className="mt-2 flex items-center gap-2 text-sm text-blue-600">
           <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          Executing JavaScript code...
+          Выполнение JavaScript...
         </div>
       )}
 
-      {/* Quick Tips */}
+      {/* Краткие советы */}
       {!isEditing && (
-        <div className="mt-2 text-xs text-gray-500">
-        Напоминание: Используйте <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+Enter</kbd> для выполнения кода, <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Tab</kbd> для отступа
+        <div className="mt-2 text-xs text-text-secondary">
+          Напоминание: Используйте <kbd className="px-1 py-0.5 bg-hover rounded text-xs">Ctrl+Enter</kbd> для выполнения кода, <kbd className="px-1 py-0.5 bg-hover rounded text-xs">Tab</kbd> для отступа
         </div>
       )}
-    </motion.div>
+    </BaseBlock>
   );
 };

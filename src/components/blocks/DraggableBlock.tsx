@@ -36,7 +36,7 @@ export const DraggableBlock = ({ block, children, index }: DraggableBlockProps) 
       className="group relative mb-3"
     >
       <div className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-        {/* Drag Handle */}
+        {/* Перетаскивание ручки */}
         <motion.div
           whileHover={{ scale: 1.1 }}
           className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing mt-2 transition-opacity p-1 hover:bg-gray-200 rounded"
@@ -44,12 +44,12 @@ export const DraggableBlock = ({ block, children, index }: DraggableBlockProps) 
           <GripVertical className="w-4 h-4 text-gray-500" />
         </motion.div>
 
-        {/* Block Content */}
+        {/* Блокировать содержимое */}
         <div className="flex-1">
           {children}
         </div>
 
-        {/* Delete Button */}
+        {/* Удалить */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={handleDelete}

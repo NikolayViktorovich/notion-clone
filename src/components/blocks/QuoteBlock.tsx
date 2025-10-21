@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Block } from '../../types';
 import { QuoteIcon } from 'lucide-react';
+import { BaseBlock } from './BaseBlock';
 
 interface QuoteBlockProps {
   block: Block;
@@ -43,13 +44,9 @@ export const QuoteBlock = ({ block }: QuoteBlockProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative"
-    >
+    <BaseBlock>
       <div className="flex gap-4">
-        <QuoteIcon className="w-6 h-6 text-gray-400 mt-1 flex-shrink-0" />
+        <QuoteIcon className="w-6 h-6 text-text-secondary mt-1 flex-shrink-0" />
         
         {isEditing ? (
           <textarea
@@ -58,19 +55,19 @@ export const QuoteBlock = ({ block }: QuoteBlockProps) => {
             onChange={(e) => setContent(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            className="flex-1 resize-none border-none outline-none bg-transparent text-lg italic text-gray-600 leading-relaxed"
+            className="flex-1 resize-none border-none outline-none bg-transparent text-lg italic leading-relaxed text-text placeholder-text-secondary"
             style={{ minHeight: '1.5em' }}
             placeholder="Write a quote..."
           />
         ) : (
           <blockquote
             onClick={() => setIsEditing(true)}
-            className="flex-1 cursor-text hover:bg-gray-50 rounded px-3 py-2 -mx-3 text-lg italic text-gray-600 leading-relaxed border-l-4 border-gray-300 pl-4"
+            className="flex-1 cursor-text hover:bg-hover rounded px-3 py-2 -mx-3 text-lg italic leading-relaxed border-l-4 border-border pl-4 text-text"
           >
-            {content || <span className="text-gray-400">Empty quote...</span>}
+            {content || <span className="text-text-secondary">Empty quote...</span>}
           </blockquote>
         )}
       </div>
-    </motion.div>
+    </BaseBlock>
   );
 };

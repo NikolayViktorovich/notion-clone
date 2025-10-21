@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Block } from '../../types';
+import { BaseBlock } from './BaseBlock';
 
 interface TextBlockProps {
   block: Block;
@@ -42,11 +43,7 @@ export const TextBlock = ({ block }: TextBlockProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative"
-    >
+    <BaseBlock>
       {isEditing ? (
         <textarea
           ref={textareaRef}
@@ -54,18 +51,18 @@ export const TextBlock = ({ block }: TextBlockProps) => {
           onChange={(e) => setContent(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-          className="w-full resize-none border-none outline-none text-lg leading-relaxed bg-transparent"
+          className="w-full resize-none border-none outline-none text-lg leading-relaxed bg-transparent text-text placeholder-text-secondary"
           style={{ minHeight: '1.5em' }}
           placeholder="Напишите что-нибудь..."
         />
       ) : (
         <div
           onClick={() => setIsEditing(true)}
-          className="cursor-text hover:bg-gray-50 rounded px-2 py-1 -mx-2 text-lg leading-relaxed whitespace-pre-wrap min-h-[1.5em]"
+          className="cursor-text hover:bg-hover rounded px-2 py-1 -mx-2 text-lg leading-relaxed whitespace-pre-wrap min-h-[1.5em] text-text"
         >
-          {content || <span className="text-gray-400">Пустой текстовый блок...</span>}
+          {content || <span className="text-text-secondary">Пустой текстовый блок...</span>}
         </div>
       )}
-    </motion.div>
+    </BaseBlock>
   );
 };

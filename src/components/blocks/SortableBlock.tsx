@@ -11,9 +11,10 @@ interface SortableBlockProps {
   block: Block;
   children: React.ReactNode;
   index: number;
+  isDragging?: boolean;
 }
 
-export const SortableBlock = ({ block, children, index }: SortableBlockProps) => {
+export const SortableBlock = ({ block, children, index, isDragging = false }: SortableBlockProps) => {
   const { deleteBlock } = useStore();
   const [deleteModal, setDeleteModal] = useState(false);
   
@@ -23,7 +24,7 @@ export const SortableBlock = ({ block, children, index }: SortableBlockProps) =>
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging: dndIsDragging,
   } = useSortable({ id: block.id });
 
   const style = {
@@ -55,7 +56,7 @@ export const SortableBlock = ({ block, children, index }: SortableBlockProps) =>
         style={style}
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
-          opacity: isDragging ? 0.5 : 1, 
+          opacity: dndIsDragging ? 0.5 : 1, 
           y: 0 
         }}
         exit={{ opacity: 0, y: -20 }}
@@ -65,17 +66,17 @@ export const SortableBlock = ({ block, children, index }: SortableBlockProps) =>
           damping: 30,
           delay: index * 0.05 
         }}
-        className={`group relative mb-3 ${isDragging ? 'z-50' : ''}`}
+        className={`group relative mb-3 ${dndIsDragging ? 'z-50' : ''}`}
       >
-        <div className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-          {/* Drag Handle */}
+        <div className="flex items-start gap-3 p-2 hover:bg-hover rounded-lg transition-colors">
+          {/* Перетаскивание ручки */}
           <motion.div
             {...attributes}
             {...listeners}
             whileHover={{ scale: 1.1 }}
-            className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing mt-2 transition-opacity p-1 hover:bg-gray-200 rounded"
+            className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing mt-2 transition-opacity p-1 hover:bg-border rounded"
           >
-            <GripVertical className="w-4 h-4 text-gray-500" />
+            <GripVertical className="w-4 h-4 text-text-secondary" />
           </motion.div>
 
           {/* Block Content */}
@@ -83,18 +84,18 @@ export const SortableBlock = ({ block, children, index }: SortableBlockProps) =>
             {children}
           </div>
 
-          {/* Delete Button */}
+          {/* Удалить */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             onClick={handleDeleteClick}
-            className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-200 rounded transition-all"
+            className="opacity-0 group-hover:opacity-100 p-2 hover:bg-border rounded transition-all"
           >
-            <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500 transition-colors" />
+            <Trash2 className="w-4 h-4 text-text-secondary hover:text-red-500 transition-colors" />
           </motion.button>
         </div>
       </motion.div>
 
-      {/* Delete Block Modal */}
+      {/* Модалка для кнопки */}
       <Modal
         isOpen={deleteModal}
         onClose={() => setDeleteModal(false)}

@@ -80,6 +80,8 @@ export interface Theme {
     border: string;
     hover: string;
     accent: string;
+    button: string;
+    buttonText: string;
   };
 }
 
@@ -89,3 +91,31 @@ export interface AppSettings {
   fontSize: number;
   reducedMotion: boolean;
 }
+
+const initialColors = {
+  light: {
+    primary: '#000000',
+    background: '#ffffff',
+    sidebar: '#f8f9fa',
+    text: '#000000',
+    textSecondary: '#666666',
+    border: '#e5e5e5',
+    hover: '#f5f5f5',
+    accent: '#000000',
+    button: '#000000',
+    buttonText: '#ffffff',
+  },
+  dark: {
+    primary: '#ffffff',
+    background: '#1a1a1a',
+    sidebar: '#2d2d2d',
+    text: '#ffffff',
+    textSecondary: '#a0a0a0',
+    border: '#404040',
+    hover: '#363636',
+    accent: '#ffffff',
+    button: '#ffffff',
+    buttonText: '#000000',
+  },
+};
+

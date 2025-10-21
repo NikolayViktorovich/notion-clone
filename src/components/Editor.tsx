@@ -4,14 +4,16 @@ import { TextBlock } from './blocks/TextBlock';
 import { HeaderBlock } from './blocks/HeaderBlock';
 import { SortableBlock } from './blocks/SortableBlock';
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Type, Heading1, List, Code, Quote, Download } from 'lucide-react';
+import { Plus, Type, Heading1, List, Code, Quote, Download, ChevronLeft } from 'lucide-react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable, DndContext, DragEndEvent, DragStartEvent, closestCenter } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
 import { TodoBlock } from './blocks/TodoBlock';
 import { AdvancedCodeBlock } from './blocks/AdvancedCodeBlock';
 import { QuoteBlock } from './blocks/QuoteBlock';
 import { UndoRedo } from './ui/UndoRedo';
+import { formatDate } from '../utils/dateUtils';
+import { GoogleDriveManager } from './google/GoogleDriveManager';
+import { useNavigate } from 'react-router-dom';
 
 export const Editor = () => {
   const { currentPage, updatePage, createBlock, moveBlock } = useStore();
@@ -21,10 +23,23 @@ export const Editor = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const blockMenuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const { setNodeRef } = useDroppable({
     id: 'editor-drop-area',
   });
+
+  const fastTransition = {
+    type: "tween" as const,
+    duration: 0.08,
+    ease: "easeOut" as const
+  };
+
+  const microTransition = {
+    type: "tween" as const,
+    duration: 0.05,
+    ease: "linear" as const
+  };
 
   useEffect(() => {
     if (currentPage) {
@@ -129,79 +144,74 @@ export const Editor = () => {
   };
 
   const blockTypes = [
-    { type: 'text' as const, icon: Type, label: 'Текст', color: 'text-gray-600' },
-    { type: 'heading' as const, icon: Heading1, label: 'Заголовок', color: 'text-gray-600' },
-    { type: 'todo' as const, icon: List, label: 'To Do', color: 'text-gray-600' },
-    { type: 'code' as const, icon: Code, label: 'Код', color: 'text-gray-600' },
-    { type: 'quote' as const, icon: Quote, label: 'Цитата', color: 'text-gray-600' },
+    { type: 'text' as const, icon: Type, label: 'Текст' },
+    { type: 'heading' as const, icon: Heading1, label: 'Заголовок' },
+    { type: 'todo' as const, icon: List, label: 'To Do' },
+    { type: 'code' as const, icon: Code, label: 'Код' },
+    { type: 'quote' as const, icon: Quote, label: 'Цитата' },
   ];
 
   if (!currentPage) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-            <Plus className="w-8 h-8 text-gray-400" />
+      <div className="flex items-center justify-center h-full w-full bg-background">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-hover rounded-lg mx-auto mb-4 flex items-center justify-center">
+            <Plus className="w-8 h-8 text-text-secondary" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-text mb-2">
             Страница не выбрана
           </h2>
-          <p className="text-gray-500">
+          <p className="text-text-secondary">
             Выберите страницу на боковой панели или создайте новую
           </p>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      key={currentPage.id}
-      className="flex-1 overflow-y-auto bg-white"
-    >
-      <div className="max-w-4xl mx-auto px-8 py-12">
-        {/* Header Actions */}
-        <div className="flex justify-between items-center mb-8">
-  <UndoRedo />
-  <motion.button
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    onClick={handleExportPage}
-    className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm"
-  >
-    <Download className="w-4 h-4" />
-    Экспорт страницы
-  </motion.button>
-</div>
+    <div className="flex-1 overflow-y-auto bg-background min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+        <div className="lg:hidden mb-4">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-text hover:bg-hover rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Назад к страницам
+          </button>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 lg:mb-8">
+          <UndoRedo />
+          <div className="flex gap-2 flex-wrap">
+            <GoogleDriveManager />
+            <button
+              onClick={handleExportPage}
+              className="flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button flex-1 sm:flex-none justify-center"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Экспорт страницы</span>
+              <span className="sm:hidden">Экспорт</span>
+            </button>
+          </div>
+        </div>
 
-        {/* Page Cover */}
+        {/* Обложка */}
         {currentPage.cover && (
-          <motion.img
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+          <img
             src={currentPage.cover}
             alt="Cover"
-            className="w-full h-48 object-cover rounded-lg mb-8"
+            className="w-full h-32 sm:h-48 object-cover rounded-lg mb-6 lg:mb-8 border border-border"
           />
         )}
 
-        {/* Page Icon and Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-4 mb-12"
-        >
-          <button className="text-4xl mt-1 hover:bg-gray-100 rounded-lg p-2 transition-colors">
+        {/* Иконка и заголовок страницы */}
+        <div className="flex items-start gap-3 lg:gap-4 mb-8 lg:mb-12">
+          <button className="text-2xl lg:text-4xl mt-1 hover:bg-hover rounded-lg p-1 lg:p-2 transition-colors text-text flex-shrink-0">
             {currentPage.icon || '📄'}
           </button>
           
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {isEditingTitle ? (
               <textarea
                 ref={titleRef}
@@ -209,7 +219,7 @@ export const Editor = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 onBlur={handleTitleSave}
                 onKeyDown={handleTitleKeyDown}
-                className="w-full text-4xl font-bold resize-none border-none outline-none bg-transparent leading-tight text-gray-900"
+                className="w-full text-2xl lg:text-4xl font-bold resize-none border-none outline-none bg-transparent leading-tight text-text placeholder-text-secondary"
                 style={{ minHeight: '1.5em' }}
                 rows={1}
                 placeholder="Untitled"
@@ -217,97 +227,104 @@ export const Editor = () => {
             ) : (
               <h1
                 onClick={() => setIsEditingTitle(true)}
-                className="text-4xl font-bold outline-none cursor-text hover:bg-gray-50 rounded-lg px-3 py-2 -mx-3 leading-tight text-gray-900"
+                className="text-2xl lg:text-4xl font-bold outline-none cursor-text hover:bg-hover rounded-lg px-2 lg:px-3 py-1 lg:py-2 -mx-2 lg:-mx-3 leading-tight text-text break-words"
               >
                 {currentPage.title || 'Untitled'}
               </h1>
             )}
+            
+            {/* Мета */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-text-secondary text-xs lg:text-sm mt-2">
+              <span>Создано: {formatDate(currentPage.createdAt)}</span>
+              <span className="hidden sm:inline">•</span>
+              <span>Обновлено: {formatDate(currentPage.updatedAt)}</span>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Blocks with Drag & Drop */}
-        <AnimatePresence mode="wait">
-          <div key={currentPage.id}>
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            >
-              <div ref={setNodeRef}>
-                <SortableContext 
-                  items={currentPage.blocks.map(block => block.id)} 
-                  strategy={verticalListSortingStrategy}
-                >
+        {/* Drag & Drop */}
+        <div key={currentPage.id}>
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <div ref={setNodeRef}>
+              <SortableContext 
+                items={currentPage.blocks.map(block => block.id)} 
+                strategy={verticalListSortingStrategy}
+              >
+                <AnimatePresence>
                   {currentPage.blocks.map((block, index) => (
-                    <SortableBlock key={block.id} block={block} index={index}>
-  {block.type === 'text' && <TextBlock block={block} />}
-  {block.type === 'heading' && <HeaderBlock block={block} level={1} />}
-  {block.type === 'todo' && <TodoBlock block={block} />}
-  {block.type === 'code' && <AdvancedCodeBlock block={block} />}
-  {block.type === 'quote' && <QuoteBlock block={block} />}
-</SortableBlock>
+                    <motion.div
+                      key={block.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={microTransition}
+                      layout
+                    >
+                      <SortableBlock key={block.id} block={block} index={index} isDragging={activeId === block.id}>
+                        {block.type === 'text' && <TextBlock block={block} />}
+                        {block.type === 'heading' && <HeaderBlock block={block} level={1} />}
+                        {block.type === 'todo' && <TodoBlock block={block} />}
+                        {block.type === 'code' && <AdvancedCodeBlock block={block} />}
+                        {block.type === 'quote' && <QuoteBlock block={block} />}
+                      </SortableBlock>
+                    </motion.div>
                   ))}
-                </SortableContext>
-              </div>
-            </DndContext>
-          </div>
-        </AnimatePresence>
+                </AnimatePresence>
+              </SortableContext>
+            </div>
+          </DndContext>
+        </div>
 
-        {/* Add Block Menu */}
+        {/* Добавление меню */}
         <div className="relative" ref={blockMenuRef}>
           {showBlockMenu ? (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-2 gap-3 p-6 bg-gray-50 rounded-xl border border-gray-200 mb-6"
+              transition={fastTransition}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 p-4 sm:p-6 bg-hover rounded-xl border border-border mb-6"
             >
               {blockTypes.map(({ type, icon: Icon, label }) => (
-                <motion.button
+                <button
                   key={type}
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
                   onClick={() => handleAddBlock(type)}
-                  className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
+                  className="flex items-center gap-3 p-3 sm:p-4 bg-background rounded-lg border border-border text-text hover:border-accent hover:shadow-sm transition-all text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <Icon className="w-5 h-5 text-gray-700" />
-                  <span className="text-sm font-medium text-gray-900">{label}</span>
-                </motion.button>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-medium">{label}</span>
+                </button>
               ))}
             </motion.div>
           ) : (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+            <button
               onClick={() => setShowBlockMenu(true)}
-              className="w-full p-6 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-all flex items-center justify-center gap-3 hover:bg-gray-50"
+              className="w-full p-4 sm:p-6 border-2 border-dashed border-border rounded-xl text-text-secondary hover:text-text hover:border-accent transition-all flex items-center justify-center gap-2 sm:gap-3 hover:bg-hover text-sm sm:text-base"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="font-medium">Добавить блок</span>
-            </motion.button>
+            </button>
           )}
         </div>
 
-        {/* Empty State */}
+        {/* Пустое состояние */}
         {currentPage.blocks.length === 0 && !showBlockMenu && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
-          >
-            <div className="mb-6">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+          <div className="text-center py-8 lg:py-16">
+            <div className="mb-4 lg:mb-6">
+              <button
                 onClick={() => setShowBlockMenu(true)}
-                className="px-8 py-4 bg-black text-white rounded-xl text-base font-medium hover:bg-gray-800 transition-colors shadow-sm"
+                className="px-6 py-3 lg:px-8 lg:py-4 bg-accent text-white rounded-xl text-sm lg:text-base font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button hover:scale-[1.02] active:scale-[0.98]"
               >
                 + Создайте свой первый блок
-              </motion.button>
+              </button>
             </div>
-            <p className="text-gray-500 text-sm">Начните создавать свою страницу с помощью блоков контента</p>
-          </motion.div>
+            <p className="text-text-secondary text-xs lg:text-sm">Начните создавать свою страницу с помощью блоков контента</p>
+          </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 };

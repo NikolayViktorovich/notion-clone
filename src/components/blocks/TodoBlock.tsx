@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Block } from '../../types';
 import { Check, Square } from 'lucide-react';
+import { BaseBlock } from './BaseBlock';
 
 interface TodoBlockProps {
   block: Block;
@@ -48,18 +49,14 @@ export const TodoBlock = ({ block }: TodoBlockProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative"
-    >
+    <BaseBlock>
       <div className="flex items-start gap-3">
         <button
           onClick={toggleChecked}
           className={`flex-shrink-0 w-5 h-5 mt-1 border-2 rounded flex items-center justify-center transition-colors ${
             isChecked 
-              ? 'bg-black border-black text-white' 
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'bg-accent border-accent text-white' 
+              : 'border-border hover:border-text text-transparent'
           }`}
         >
           {isChecked && <Check className="w-3 h-3" />}
@@ -72,8 +69,8 @@ export const TodoBlock = ({ block }: TodoBlockProps) => {
             onChange={(e) => setContent(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            className={`flex-1 resize-none border-none outline-none bg-transparent leading-relaxed ${
-              isChecked ? 'line-through text-gray-500' : 'text-gray-800'
+            className={`flex-1 resize-none border-none outline-none bg-transparent leading-relaxed text-text placeholder-text-secondary ${
+              isChecked ? 'line-through text-text-secondary' : ''
             }`}
             style={{ minHeight: '1.5em' }}
             placeholder="Todo item..."
@@ -81,14 +78,14 @@ export const TodoBlock = ({ block }: TodoBlockProps) => {
         ) : (
           <div
             onClick={() => setIsEditing(true)}
-            className={`flex-1 cursor-text hover:bg-gray-50 rounded px-2 py-1 -mx-2 leading-relaxed whitespace-pre-wrap min-h-[1.5em] ${
-              isChecked ? 'line-through text-gray-500' : 'text-gray-800'
+            className={`flex-1 cursor-text hover:bg-hover rounded px-2 py-1 -mx-2 leading-relaxed whitespace-pre-wrap min-h-[1.5em] ${
+              isChecked ? 'line-through text-text-secondary' : 'text-text'
             }`}
           >
-            {content || <span className="text-gray-400">Empty todo item...</span>}
+            {content || <span className="text-text-secondary">Empty todo item...</span>}
           </div>
         )}
       </div>
-    </motion.div>
+    </BaseBlock>
   );
 };

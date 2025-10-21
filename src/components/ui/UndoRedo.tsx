@@ -21,9 +21,9 @@ export const UndoRedo = () => {
         whileTap={{ scale: 0.95 }}
         onClick={handleUndo}
         disabled={!canUndo()}
-        className={`p-2 rounded transition-colors ${
+        className={`p-2 rounded transition-colors border border-transparent ${
           canUndo() 
-            ? 'hover:bg-hover text-text' 
+            ? 'hover:bg-hover hover:border-border text-text' 
             : 'text-text-secondary cursor-not-allowed'
         }`}
         title="Undo (Ctrl+Z)"
@@ -38,9 +38,9 @@ export const UndoRedo = () => {
         whileTap={{ scale: 0.95 }}
         onClick={handleRedo}
         disabled={!canRedo()}
-        className={`p-2 rounded transition-colors ${
+        className={`p-2 rounded transition-colors border border-transparent ${
           canRedo() 
-            ? 'hover:bg-hover text-text' 
+            ? 'hover:bg-hover hover:border-border text-text' 
             : 'text-text-secondary cursor-not-allowed'
         }`}
         title="Redo (Ctrl+Y)"

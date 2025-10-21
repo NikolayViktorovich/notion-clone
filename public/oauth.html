@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth Callback</title>
+</head>
+<body>
+    <script>
+        console.log('OAuth callback page loaded');
+        
+        try {
+            // Для Implicit Flow - парсим из hash
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = hashParams.get('access_token');
+            const error = hashParams.get('error');
+            const errorDescription = hashParams.get('error_description');
+
+            console.log('OAuth parameters:', {
+                accessToken: accessToken ? '***' : null,
+                error,
+                errorDescription
+            });
+
+            if (accessToken) {
+                console.log('Access token received');
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({
+                        type: 'google-auth-success',
+                        token: accessToken
+                    }, window.location.origin);
+                }
+            } else if (error) {
+                console.error('Authentication error:', error, errorDescription);
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({
+                        type: 'google-auth-error',
+                        error: errorDescription || error
+                    }, window.location.origin);
+                }
+            } else {
+                console.error('No access token or error found');
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({
+                        type: 'google-auth-error',
+                        error: 'No authentication data received'
+                    }, window.location.origin);
+                }
+            }
+            
+            setTimeout(() => {
+                window.close();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('OAuth callback error:', error);
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({
+                    type: 'google-auth-error',
+                    error: 'Unexpected error occurred'
+                }, window.location.origin);
+            }
+            window.close();
+        }
+    </script>
+</body>
+</html>

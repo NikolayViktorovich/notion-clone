@@ -1,31 +1,49 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
-interface ModalProps {
+interface InputModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (value: string) => void;
   title: string;
   description?: string;
   confirmText?: string;
   cancelText?: string;
-  type?: 'delete' | 'warning' | 'default';
-  children?: React.ReactNode;
+  placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export const Modal = ({
+export const InputModal = ({
   isOpen,
   onClose,
   onConfirm,
   title,
   description,
-  confirmText = 'Удалить',
+  confirmText = 'Сохранить',
   cancelText = 'Отмена',
-  type = 'delete',
-  children
-}: ModalProps) => {
+  placeholder = 'Введите значение',
+  value,
+  onChange
+}: InputModalProps) => {
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleConfirm = () => {
+    if (value.trim()) {
+      onConfirm(value);
+      onClose();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleConfirm();
+    }
+    if (e.key === 'Escape') {
       onClose();
     }
   };
@@ -46,6 +64,7 @@ export const Modal = ({
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="bg-background border border-border rounded-xl shadow-lg max-w-md w-full p-6"
           >
+            {/* Хэдер */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-text">
                 {title}
@@ -57,18 +76,26 @@ export const Modal = ({
                 <X className="w-5 h-5 text-text-secondary" />
               </button>
             </div>
+
+            {/* Описание */}
             {description && (
               <p className="text-text-secondary mb-4">
                 {description}
               </p>
             )}
-            {children && (
-              <div className="mb-6">
-                {children}
-              </div>
-            )}
 
-            {/* Действия */}
+            {/* Ввод */}
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-text placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent mb-6"
+              onKeyDown={handleKeyDown}
+              autoFocus
+            />
+
+            {/* ДЕйствия */}
             <div className="flex gap-3 justify-end">
               <button
                 onClick={onClose}
@@ -77,15 +104,9 @@ export const Modal = ({
                 {cancelText}
               </button>
               <button
-                onClick={() => {
-                  onConfirm();
-                  onClose();
-                }}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
-                  type === 'delete' 
-                    ? 'bg-red-600 hover:bg-red-700' 
-                    : 'bg-accent hover:opacity-90'
-                }`}
+                onClick={handleConfirm}
+                disabled={!value.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-accent hover:opacity-90 rounded-lg transition-colors disabled:opacity-50"
               >
                 {confirmText}
               </button>

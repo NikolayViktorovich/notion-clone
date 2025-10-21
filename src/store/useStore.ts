@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { Block, Page, Workspace, NewBlock, Comment, PageTemplate, SearchResult, SearchMatch } from '../types';
 import { serializeState, deserializeState, cloneState } from '../utils/serialization';
+import { offlineStorage } from '../services/offlineStorage';
 
 interface HistoryState {
   past: string[];
@@ -10,15 +11,13 @@ interface HistoryState {
 }
 
 interface AppState {
-  // State
   workspaces: Workspace[];
   currentWorkspace: Workspace | null;
   currentPage: Page | null;
   sidebarOpen: boolean;
   history: HistoryState;
   templates: PageTemplate[];
-  
-  // Actions
+  offlineStatus: { isOnline: boolean; hasData: boolean };
   setSidebarOpen: (open: boolean) => void;
   setCurrentPage: (pageId: string) => void;
   createPage: (workspaceId: string, page: Omit<Page, 'id' | 'createdAt' | 'updatedAt'>) => string;
@@ -28,26 +27,21 @@ interface AppState {
   updateBlock: (blockId: string, updates: Partial<Block>) => void;
   deleteBlock: (blockId: string) => void;
   moveBlock: (blockId: string, newIndex: number) => void;
-  
-  // History Actions
   undo: () => void;
   redo: () => void;
   captureHistory: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
-
-  // Комментарии
   addComment: (blockId: string, content: string, userId?: string, userName?: string) => void;
   updateComment: (commentId: string, updates: Partial<Comment>) => void;
   deleteComment: (commentId: string) => void;
   resolveComment: (commentId: string) => void;
   getBlockComments: (blockId: string) => Comment[];
-
-  // Поиск
   searchContent: (query: string) => SearchResult[];
-
-  // Шаблоны
   createPageFromTemplate: (workspaceId: string, templateId: string) => string;
+  initializeOffline: () => Promise<void>;
+  saveToOffline: () => Promise<void>;
+  forceSync: () => Promise<void>;
 }
 
 function findPageInWorkspaces(workspaces: Workspace[], pageId: string): Page | null {
@@ -64,7 +58,6 @@ function getCurrentWorkspaceState(workspaces: Workspace[]): Workspace[] {
 
 export const useStore = create<AppState>()(
   devtools((set, get) => ({
-    // Initial state
     workspaces: [
       {
         id: 'default',
@@ -90,8 +83,7 @@ export const useStore = create<AppState>()(
       ]),
       future: []
     },
-
-    // Шаблоны страниц
+    offlineStatus: { isOnline: navigator.onLine, hasData: false },
     templates: [
       {
         id: 'blank',
@@ -215,6 +207,47 @@ export const useStore = create<AppState>()(
       },
     ],
 
+    initializeOffline: async () => {
+      try {
+        const [workspaces, pages] = await Promise.all([
+          offlineStorage.loadWorkspaces(),
+          offlineStorage.loadPages()
+        ]);
+
+        if (workspaces.length > 0 || pages.length > 0) {
+          const currentState = get();
+          set({ 
+            workspaces: workspaces.length > 0 ? workspaces : currentState.workspaces,
+            currentWorkspace: workspaces[0] || currentState.currentWorkspace
+          });
+        }
+
+        set({ offlineStatus: offlineStorage.getStatus() });
+      } catch (error) {
+        console.error('Error initializing offline data:', error);
+      }
+    },
+
+    saveToOffline: async () => {
+      const state = get();
+      try {
+        await Promise.all([
+          offlineStorage.saveWorkspaces(state.workspaces),
+          offlineStorage.savePages(state.workspaces.flatMap((w: any) => w.pages)),
+          offlineStorage.saveBlocks(state.currentPage?.blocks || [])
+        ]);
+        
+        set({ offlineStatus: offlineStorage.getStatus() });
+      } catch (error) {
+        console.error('Error saving to offline storage:', error);
+      }
+    },
+
+    forceSync: async () => {
+      await offlineStorage.forceSync();
+      set({ offlineStatus: offlineStorage.getStatus() });
+    },
+
     captureHistory: () => {
       const state = get();
       const currentState = getCurrentWorkspaceState(state.workspaces);
@@ -252,6 +285,8 @@ export const useStore = create<AppState>()(
         currentPage: state.currentPage ? 
           findPageInWorkspaces(previousState, state.currentPage.id) : null
       });
+
+      state.saveToOffline();
     },
 
     redo: () => {
@@ -277,6 +312,8 @@ export const useStore = create<AppState>()(
         currentPage: state.currentPage ? 
           findPageInWorkspaces(nextState, state.currentPage.id) : null
       });
+
+      state.saveToOffline();
     },
 
     canUndo: () => {
@@ -317,6 +354,8 @@ export const useStore = create<AppState>()(
         currentWorkspace: state.workspaces.find(w => w.id === workspaceId) || state.currentWorkspace,
       }));
 
+      state.saveToOffline();
+
       return newPage.id;
     },
 
@@ -347,6 +386,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     deletePage: (pageId) => {
@@ -366,6 +407,8 @@ export const useStore = create<AppState>()(
           currentPage: newCurrentPage,
         };
       });
+
+      state.saveToOffline();
     },
 
     createBlock: (pageId, block) => {
@@ -401,6 +444,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     updateBlock: (blockId, updates) => {
@@ -442,6 +487,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     deleteBlock: (blockId) => {
@@ -465,6 +512,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     moveBlock: (blockId: string, newIndex: number) => {
@@ -497,9 +546,10 @@ export const useStore = create<AppState>()(
           })),
         };
       });
+
+      state.saveToOffline();
     },
 
-    // Комментарии
     addComment: (blockId, content, userId = 'user1', userName = 'Current User') => {
       const state = get();
       state.captureHistory();
@@ -545,6 +595,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     updateComment: (commentId, updates) => {
@@ -580,6 +632,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     deleteComment: (commentId) => {
@@ -607,6 +661,8 @@ export const useStore = create<AppState>()(
             }
           : state.currentPage,
       }));
+
+      state.saveToOffline();
     },
 
     resolveComment: (commentId) => {
@@ -619,7 +675,6 @@ export const useStore = create<AppState>()(
       return block?.comments?.filter(comment => !comment.resolved) || [];
     },
 
-    // Поиск
     searchContent: (query) => {
       const state = get();
       const results: SearchResult[] = [];
@@ -670,29 +725,27 @@ export const useStore = create<AppState>()(
       return results;
     },
 
-    // Шаблоны
-createPageFromTemplate: (workspaceId, templateId) => {
-  const state = get();
-  const template = state.templates.find(t => t.id === templateId);
-  
-  if (!template) {
-    throw new Error(`Template ${templateId} not found`);
-  }
+    createPageFromTemplate: (workspaceId, templateId) => {
+      const state = get();
+      const template = state.templates.find(t => t.id === templateId);
+      
+      if (!template) {
+        throw new Error(`Template ${templateId} not found`);
+      }
 
-  // Преобразуем NewBlock[] в Block[]
-  const blocks: Block[] = template.blocks.map(newBlock => ({
-    ...newBlock,
-    id: crypto.randomUUID(),
-    children: newBlock.children || [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }));
+      const blocks: Block[] = template.blocks.map(newBlock => ({
+        ...newBlock,
+        id: crypto.randomUUID(),
+        children: newBlock.children || [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }));
 
-  return state.createPage(workspaceId, {
-    title: template.name,
-    icon: template.icon,
-    blocks: blocks,
-  });
-},
+      return state.createPage(workspaceId, {
+        title: template.name,
+        icon: template.icon,
+        blocks: blocks,
+      });
+    },
   }))
 );

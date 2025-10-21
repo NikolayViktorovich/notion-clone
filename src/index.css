@@ -1,10 +1,8 @@
-/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Light theme defaults */
   --color-primary: #000000;
   --color-background: #ffffff;
   --color-sidebar: #f8f9fa;
@@ -13,6 +11,8 @@
   --color-border: #e5e5e5;
   --color-hover: #f5f5f5;
   --color-accent: #000000;
+  --color-button: #000000;
+  --color-button-text: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -23,7 +23,9 @@
   --color-text-secondary: #a0a0a0;
   --color-border: #404040;
   --color-hover: #363636;
-  --color-accent: #ffffff;
+  --color-accent: #3b82f6;
+  --color-button: #3b82f6;
+  --color-button-text: #ffffff;
 }
 
 [data-theme="blue-dark"] {
@@ -35,6 +37,8 @@
   --color-border: #334155;
   --color-hover: #334155;
   --color-accent: #3b82f6;
+  --color-button: #3b82f6;
+  --color-button-text: #ffffff;
 }
 
 [data-theme="warm-light"] {
@@ -46,59 +50,73 @@
   --color-border: #fdba74;
   --color-hover: #fed7aa;
   --color-accent: #ea580c;
+  --color-button: #ea580c;
+  --color-button-text: #ffffff;
 }
 
-/* Apply theme colors to base elements */
-* {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-body {
+.bg-background {
   background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Custom scrollbar for different themes */
-::-webkit-scrollbar {
-  width: 6px;
+.bg-sidebar {
+  background-color: var(--color-sidebar);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-sidebar);
+.bg-hover {
+  background-color: var(--color-hover);
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
-}
-
-/* Ensure all text elements use theme colors */
-h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, select {
+.text-text {
   color: var(--color-text);
 }
 
-/* Input fields */
-input, textarea {
-  background-color: var(--color-background);
-  border-color: var(--color-border);
-  color: var(--color-text);
-}
-
-input::placeholder, textarea::placeholder {
+.text-text-secondary {
   color: var(--color-text-secondary);
 }
 
-/* Buttons */
-button {
-  color: var(--color-text);
+.border-border {
+  border-color: var(--color-border);
 }
 
-/* Links */
-a {
+.bg-accent {
+  background-color: var(--color-accent);
+}
+
+.text-accent {
   color: var(--color-accent);
+}
+
+.btn-primary {
+  background-color: var(--color-button) !important;
+  color: var(--color-button-text) !important;
+}
+
+.btn-secondary {
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+[data-theme-id="dark"] .special-theme-button {
+  background-color: #363636 !important;
+  color: #ffffff !important;
+  border-color: #363636 !important;
+}
+
+[data-theme-id="blue-dark"] .special-theme-button {
+  background-color: #3b82f6 !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+
+[data-theme-id="dark"] .special-theme-button:hover {
+  background-color: #363636 !important;
+}
+
+[data-theme-id="blue-dark"] .special-theme-button:hover {
+  background-color: #3b82f6 !important;
 }

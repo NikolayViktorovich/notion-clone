@@ -25,6 +25,8 @@ const defaultThemes: Theme[] = [
       border: '#e5e5e5',
       hover: '#f5f5f5',
       accent: '#000000',
+      button: '#000000',
+      buttonText: '#ffffff',
     },
   },
   {
@@ -32,14 +34,16 @@ const defaultThemes: Theme[] = [
     name: 'Тёмная',
     type: 'dark',
     colors: {
-      primary: '#ffffff',
+      primary: '#3c3b3b',
       background: '#1a1a1a',
       sidebar: '#2d2d2d',
       text: '#ffffff',
       textSecondary: '#a0a0a0',
       border: '#404040',
       hover: '#363636',
-      accent: '#ffffff',
+      accent: '#000000',
+      button: '#000000', 
+      buttonText: '#ffffff',
     },
   },
   {
@@ -55,6 +59,8 @@ const defaultThemes: Theme[] = [
       border: '#334155',
       hover: '#334155',
       accent: '#3b82f6',
+      button: '#3b82f6',
+      buttonText: '#ffffff',
     },
   },
   {
@@ -70,6 +76,8 @@ const defaultThemes: Theme[] = [
       border: '#fdba74',
       hover: '#fed7aa',
       accent: '#ea580c',
+      button: '#ea580c',
+      buttonText: '#ffffff',
     },
   },
 ];
@@ -140,5 +148,10 @@ function applyThemeToDocument(theme: Theme) {
   root.style.setProperty('--color-border', theme.colors.border);
   root.style.setProperty('--color-hover', theme.colors.hover);
   root.style.setProperty('--color-accent', theme.colors.accent);
-  root.setAttribute('data-theme', theme.type);
+  root.style.setProperty('--color-button', theme.colors.button);
+  root.style.setProperty('--color-button-text', theme.colors.buttonText);
+  root.setAttribute('data-theme', theme.type); 
+  root.setAttribute('data-theme-id', theme.id);
 }
+
+export { applyThemeToDocument };
