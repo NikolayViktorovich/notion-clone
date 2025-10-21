@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Globe, Save, Tag, ExternalLink, Copy, Download } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, Globe, Save, ExternalLink, Copy, Download } from 'lucide-react';
 import { useWebClipper } from '../../hooks/useWebClipper';
 import { useNotification } from '../../hooks/useNotification';
 import { Notification } from '../ui/Notification';
@@ -104,17 +104,6 @@ export const WebClipper = () => {
       console.error('Clipboard error:', error);
       notifyError('Не удалось получить данные из буфера обмена');
     }
-  };
-
-  const handleQuickSave = (content: string) => {
-    const clipData = {
-      url: window.location.href,
-      title: document.title,
-      content: content,
-      excerpt: content.substring(0, 200) + '...'
-    };
-    openClipper(clipData);
-    setTitle(document.title);
   };
 
   if (!isClipperOpen) return null;

@@ -653,8 +653,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           </div>
         </motion.div>
       )}
-
-      {/* Редактор кода */}
       {isEditing ? (
         <textarea
           ref={textareaRef}
@@ -676,8 +674,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           </code>
         </pre>
       )}
-
-      {/* Индикатор загруженных модулей */}
       {loadedModules.length > 0 && (
         <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
           <span>Загруженные модули:</span>

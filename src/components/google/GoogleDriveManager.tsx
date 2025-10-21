@@ -41,7 +41,7 @@ export const GoogleDriveManager = () => {
       };
 
       const content = JSON.stringify(pageData, null, 2);
-      const fileId = await saveToDrive(fileName, content);
+      await saveToDrive(fileName, content);
       
       setSaveModal(false);
       setFileName('');
@@ -60,7 +60,6 @@ export const GoogleDriveManager = () => {
       const content = await loadFromDrive(fileId);
       const pageData = JSON.parse(content);
       
-      // Здесь можно добавить логику загрузки данных в редактор
       console.log('Loaded page data:', pageData);
       notifySuccess('Страница загружена из Google Drive!');
       

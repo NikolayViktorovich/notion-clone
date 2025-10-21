@@ -21,6 +21,14 @@ export const Notification = ({
 }: NotificationProps) => {
   const [isClosing, setIsClosing] = useState(false);
 
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 300);
+  };
+
   useEffect(() => {
     if (!isVisible) return;
 
@@ -29,15 +37,7 @@ export const Notification = ({
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [isVisible, duration]);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-    }, 300);
-  };
+  }, [isVisible, duration, handleClose]);
 
   const getIcon = () => {
     switch (type) {

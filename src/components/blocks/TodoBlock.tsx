@@ -1,8 +1,7 @@
-import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Block } from '../../types';
-import { Check, Square } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { BaseBlock } from './BaseBlock';
 
 interface TodoBlockProps {

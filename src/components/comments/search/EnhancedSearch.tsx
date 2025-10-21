@@ -9,15 +9,6 @@ interface SearchMatch {
   end: number;
 }
 
-interface SearchResult {
-  pageId: string;
-  pageTitle: string;
-  blockId: string;
-  blockType: string;
-  content: string;
-  matches: SearchMatch[];
-}
-
 export const EnhancedSearch = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');

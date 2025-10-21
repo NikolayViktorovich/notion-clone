@@ -25,10 +25,10 @@ function App() {
     if (theme) {
       applyThemeToDocument(theme);
     }
-  }, [currentTheme, themes]);
+  }, [currentTheme, themes, workspaces]);
+  
 
   useEffect(() => {
-    // Инициализируем оффлайн-режим
     initializeOffline();
 
     if (workspaces.length > 0 && workspaces[0].pages.length === 0) {

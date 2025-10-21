@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Block } from '../../types';

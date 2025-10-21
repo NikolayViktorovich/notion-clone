@@ -262,59 +262,57 @@ export const useStore = create<AppState>()(
       });
     },
 
-    undo: () => {
-      const state = get();
-      const { past, present, future } = state.history;
-      
-      if (past.length === 0) return;
+undo: () => {
+  const state = get();
+  const { past, present, future } = state.history;
+  
+  if (past.length === 0) return;
 
-      const previousStateSerialized = past[past.length - 1];
-      const newPast = past.slice(0, past.length - 1);
+  const previousStateSerialized = past[past.length - 1];
+  const newPast = past.slice(0, past.length - 1);
 
-      const previousState = deserializeState<Workspace[]>(previousStateSerialized);
-      const currentState = deserializeState<Workspace[]>(present);
+  const previousState = deserializeState<Workspace[]>(previousStateSerialized);
 
-      set({
-        workspaces: previousState,
-        history: {
-          past: newPast,
-          present: previousStateSerialized,
-          future: [present, ...future]
-        },
-        currentWorkspace: previousState[0] || null,
-        currentPage: state.currentPage ? 
-          findPageInWorkspaces(previousState, state.currentPage.id) : null
-      });
-
-      state.saveToOffline();
+  set({
+    workspaces: previousState,
+    history: {
+      past: newPast,
+      present: previousStateSerialized,
+      future: [present, ...future]
     },
+    currentWorkspace: previousState[0] || null,
+    currentPage: state.currentPage ? 
+      findPageInWorkspaces(previousState, state.currentPage.id) : null
+  });
 
-    redo: () => {
-      const state = get();
-      const { past, present, future } = state.history;
-      
-      if (future.length === 0) return;
+  state.saveToOffline();
+},
 
-      const nextStateSerialized = future[0];
-      const newFuture = future.slice(1);
+redo: () => {
+  const state = get();
+  const { past, present, future } = state.history;
+  
+  if (future.length === 0) return;
 
-      const nextState = deserializeState<Workspace[]>(nextStateSerialized);
-      const currentState = deserializeState<Workspace[]>(present);
+  const nextStateSerialized = future[0];
+  const newFuture = future.slice(1);
 
-      set({
-        workspaces: nextState,
-        history: {
-          past: [...past, present],
-          present: nextStateSerialized,
-          future: newFuture
-        },
-        currentWorkspace: nextState[0] || null,
-        currentPage: state.currentPage ? 
-          findPageInWorkspaces(nextState, state.currentPage.id) : null
-      });
+  const nextState = deserializeState<Workspace[]>(nextStateSerialized);
 
-      state.saveToOffline();
+  set({
+    workspaces: nextState,
+    history: {
+      past: [...past, present],
+      present: nextStateSerialized,
+      future: newFuture
     },
+    currentWorkspace: nextState[0] || null,
+    currentPage: state.currentPage ? 
+      findPageInWorkspaces(nextState, state.currentPage.id) : null
+  });
+
+  state.saveToOffline();
+},
 
     canUndo: () => {
       return get().history.past.length > 0;
