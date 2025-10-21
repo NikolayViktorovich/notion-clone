@@ -1,4 +1,3 @@
-// src/components/UndoRedo.tsx
 import { Undo2, Redo2 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { motion } from 'framer-motion';

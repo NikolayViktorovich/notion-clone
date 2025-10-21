@@ -61,7 +61,6 @@
       "last 1 safari version"
     ]
   },
-  
   "devDependencies": {
     "@types/node": "^24.7.2",
     "autoprefixer": "^10.4.21",

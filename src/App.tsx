@@ -6,30 +6,27 @@ import { useEffect, useState } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { ThemeToggle } from './components/theme/ThemeToggle';
 import { EnhancedSearch } from './components/comments/search/EnhancedSearch';
-import { UndoRedo } from './components/ui/UndoRedo';
 import { applyThemeToDocument } from './hooks/useTheme';
 import { WebClipper } from './components/web/WebClipper';
 import { WebClipperButton } from './components/web/WebClipperButton';
-import { AnimatePresence, motion } from 'framer-motion';
 import { Loading } from './components/ui/Loading';
 import { OfflineStatus } from './components/ui/OfflineStatus';
+import { Menu } from 'lucide-react';
 
 function App() {
   const { workspaces, createPage, currentPage, sidebarOpen, setSidebarOpen, initializeOffline } = useStore();
   const { currentTheme, themes } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [appLoaded, setAppLoaded] = useState(false);
+  const [themeKey, setThemeKey] = useState(0);
 
   useEffect(() => {
     const theme = themes.find(t => t.id === currentTheme);
     if (theme) {
       applyThemeToDocument(theme);
+      setThemeKey(prev => prev + 1);
     }
-  }, [currentTheme, themes]);
-
-  useEffect(() => {
     initializeOffline();
-
     if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
       createPage('default', {
         title: 'Welcome to Notion Clone',
@@ -53,151 +50,89 @@ function App() {
         ],
       });
     }
-  }, [workspaces, createPage, initializeOffline]);
+  }, [currentTheme]);
 
-  const handleAppLoad = () => {
-    setAppLoaded(true);
-  };
+  if (!appLoaded) {
+    // Если приложение ещё не загружено — показываем лоадер
+    return <Loading onLoadComplete={() => setAppLoaded(true)} />;
+  }
 
   return (
-    <>
-      <Loading onLoadComplete={handleAppLoad} />
-      
-      <AnimatePresence>
-        {appLoaded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0 }}
-          >
-            <Router>
-              <div className="flex h-screen bg-background">
-                {/* Desktop Sidebar */}
-                <AnimatePresence>
-                  {sidebarOpen && (
-                    <motion.div
-                      initial={{ x: -320, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -320, opacity: 0 }}
-                      transition={{ 
-                        type: "tween",
-                        duration: 0.5,
-                        ease: "easeInOut" as const
-                      }}
-                      className="hidden lg:block w-80 flex-shrink-0"
-                    >
-                      <Sidebar />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                {/* Main Content Area */}
-                <div className="flex-1 flex flex-col min-w-0">
-                  {/* Top Bar */}
-                  <div className="flex items-center justify-between p-4 border-b border-border bg-background">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      {/* Mobile Menu Button */}
-                      <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="lg:hidden p-2 rounded-lg hover:bg-hover transition-colors text-text"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                      </button>
-
-                      {/* Desktop Menu Button */}
-                      {!sidebarOpen && (
-                        <button
-                          onClick={() => setSidebarOpen(true)}
-                          className="hidden lg:flex p-2 rounded-lg hover:bg-hover transition-colors text-text"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                          </svg>
-                        </button>
-                      )}
-                      
-                      {/* Enhanced Search */}
-                      <div className="flex-1 max-w-2xl">
-                        <EnhancedSearch />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
-                      {/* Offline Status */}
-                      <OfflineStatus />
-                      
-                      {/* Page Title for mobile */}
-                      {currentPage && (
-                        <h1 className="text-sm font-semibold text-text lg:hidden truncate max-w-[120px]">
-                          {currentPage.title}
-                        </h1>
-                      )}
-                      
-                      {/* Web Clipper Button */}
-                      <div className="hidden sm:block">
-                        <WebClipperButton />
-                      </div>
-                      
-                      {/* Theme Toggle */}
-                      <ThemeToggle />
-                      
-                      {/* Undo/Redo Controls */}
-                      <UndoRedo />
-                    </div>
-                  </div>
-
-                  {/* Editor Area */}
-                  <div className="flex-1 overflow-auto">
-                    <Routes>
-                      <Route path="/" element={<Editor />} />
-                      <Route path="/page/:pageId" element={<Editor />} />
-                    </Routes>
-                  </div>
-                </div>
-
-                {/* Mobile Sidebar Overlay */}
-                <AnimatePresence>
-                  {isMobileMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.1 }}
-                      className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    />
-                  )}
-                </AnimatePresence>
-                
-                {/* Mobile Sidebar */}
-                <AnimatePresence>
-                  {isMobileMenuOpen && (
-                    <motion.div
-                      initial={{ x: -320, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -320, opacity: 0 }}
-                      transition={{ 
-                        type: "tween",
-                        duration: 0.2,
-                        ease: "easeInOut" as const
-                      }}
-                      className="fixed inset-y-0 left-0 z-50 lg:hidden"
-                    >
-                      <Sidebar onMobileClose={() => setIsMobileMenuOpen(false)} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Web Clipper Modal */}
-                <WebClipper />
-              </div>
-            </Router>
-          </motion.div>
+    <Router key={themeKey}>
+      <div className="flex h-screen bg-background safe-area-inset">
+        {/* Desktop Sidebar */}
+        {sidebarOpen && (
+          <div className="hidden lg:block w-80 flex-shrink-0">
+            <Sidebar isSidebarOpen={sidebarOpen} />
+          </div>
         )}
-      </AnimatePresence>
-    </>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 w-full">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-border bg-background safe-area-inset-top pt-6 lg:pt-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-hover transition-colors text-text flex-shrink-0 mt-3"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              {/* Desktop Menu Button */}
+                  {!sidebarOpen && (
+                    <button
+                      onClick={() => setSidebarOpen(true)}
+                      className="hidden lg:flex p-2 rounded-lg hover:bg-hover transition-colors text-text flex-shrink-0"
+                    >
+                      <Menu className="w-5 h-5" />
+                    </button>
+                  )}
+              {/* Desktop Search */}
+              <div className="hidden lg:block flex-1 max-w-2xl">
+                <EnhancedSearch />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 mt-3 lg:mt-0.5">
+              <OfflineStatus />
+              <div className="hidden sm:block">
+                <WebClipperButton />
+              </div>
+              <ThemeToggle />
+            </div>
+          </div>
+
+          {/* Editor Area */}
+          <div className="flex-1 overflow-auto w-full">
+            <Routes>
+              <Route path="/" element={<Editor />} />
+              <Route path="/page/:pageId" element={<Editor />} />
+            </Routes>
+          </div>
+        </div>
+
+        {/* Mobile Sidebar Overlay */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+        {/* Mobile Sidebar */}
+        <div className={`fixed inset-y-0 left-0 z-50 lg:hidden w-80 max-w-[85vw] transform transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } safe-area-inset-top`}>
+          <div className="pt-4 lg:pt-0 h-full">
+            <Sidebar
+              isSidebarOpen={isMobileMenuOpen}
+              onMobileClose={() => setIsMobileMenuOpen(false)}
+            />
+          </div>
+        </div>
+
+        {/* Web Clipper Modal */}
+        <WebClipper />
+      </div>
+    </Router>
   );
 }
 

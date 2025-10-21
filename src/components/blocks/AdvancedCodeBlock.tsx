@@ -606,47 +606,47 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         </div>
       </div>
 
-      {showSettings && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="mb-4 p-4 bg-hover border border-border rounded-lg"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Шаблоны кода */}
-            <div>
-              <h4 className="text-sm font-medium text-text mb-2">Шаблоны темплейтов</h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {codeTemplates.map((template, index) => (
-                  <button
-                    key={index}
-                    onClick={() => insertTemplate(template.code)}
-                    className="w-full text-left p-2 text-xs bg-background border border-border rounded hover:border-accent transition-colors"
-                  >
-                    <div className="font-medium text-text">{template.name}</div>
-                    <div className="text-text-secondary text-xs mt-1">
-                      {template.code.split('\n')[0].replace('// ', '')}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-text mb-2">Поддерживающиеся модули</h4>
-              <div className="space-y-1 max-h-60 overflow-y-auto">
-                {supportedModules.map((module) => (
-                  <div key={module.name} className="flex items-center justify-between text-xs p-2 hover:bg-background rounded">
-                    <span className="font-mono bg-background text-text px-2 py-1 rounded">
-                      {module.name}
-                    </span>
-                    <span className="text-text-secondary text-right">{module.description}</span>
+    {showSettings && (
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        className="mb-4 p-4 bg-hover border border-border rounded-lg max-w-full overflow-x-auto"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
+          {/* Шаблоны кода */}
+          <div className="min-w-0">
+            <h4 className="text-sm font-medium text-text mb-2">Шаблоны темплейтов</h4>
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {codeTemplates.map((template, index) => (
+                <button
+                  key={index}
+                  onClick={() => insertTemplate(template.code)}
+                  className="w-full text-left p-2 text-xs bg-background border border-border rounded hover:border-accent transition-colors min-w-0"
+                >
+                  <div className="font-medium text-text truncate">{template.name}</div>
+                  <div className="text-text-secondary text-xs mt-1 truncate">
+                    {template.code.split('\n')[0].replace('// ', '')}
                   </div>
-                ))}
-              </div>
+                </button>
+              ))}
             </div>
           </div>
-        </motion.div>
+
+          <div className="min-w-0">
+            <h4 className="text-sm font-medium text-text mb-2">Поддерживающиеся модули</h4>
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              {supportedModules.map((module) => (
+                <div key={module.name} className="flex items-center justify-between text-xs p-2 hover:bg-background rounded min-w-0">
+                  <span className="font-mono bg-background text-text px-2 py-1 rounded truncate">
+                    {module.name}
+                  </span>
+                  <span className="text-text-secondary text-right truncate ml-2">{module.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
       )}
       {isEditing ? (
         <textarea
@@ -667,9 +667,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           <code className="language-javascript">
             {content || (
               <span className="text-text-secondary">
-                {/* Click to write code... */}
-                {/* Use templates from settings for quick start */}
-                Click to write code...\nUse templates from settings for quick start
+                Нажмите, чтобы написать код...\nИспользуйте шаблоны из настроек для быстрого старта
               </span>
             )}
           </code>
@@ -687,34 +685,34 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           </div>
         </div>
       )}
-      {output && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="mt-3 border border-border rounded-lg overflow-hidden"
-        >
-          <div className="flex items-center justify-between bg-hover px-4 py-2 border-b border-border">
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-text">Output</span>
-              {executionTime > 0 && (
-                <span className="text-xs text-text-secondary">
-                  {executionTime.toFixed(2)}ms
-                </span>
-              )}
+        {output && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="mt-3 border border-border rounded-lg overflow-hidden max-w-full"
+          >
+            <div className="flex items-center justify-between bg-hover px-4 py-2 border-b border-border">
+              <div className="flex items-center gap-4 min-w-0">
+                <span className="text-sm font-medium text-text truncate">Output</span>
+                {executionTime > 0 && (
+                  <span className="text-xs text-text-secondary flex-shrink-0">
+                    {executionTime.toFixed(2)}ms
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={clearOutput}
+                className="text-xs text-text-secondary hover:text-text flex items-center gap-1 flex-shrink-0"
+              >
+                <Trash2 className="w-3 h-3" />
+                Clear
+              </button>
             </div>
-            <button
-              onClick={clearOutput}
-              className="text-xs text-text-secondary hover:text-text flex items-center gap-1"
-            >
-              <Trash2 className="w-3 h-3" />
-              Clear
-            </button>
-          </div>
-          <pre className="font-mono text-sm bg-background p-4 max-h-80 overflow-y-auto whitespace-pre-wrap text-text">
-            <code>{output}</code>
-          </pre>
-        </motion.div>
-      )}
+            <pre className="font-mono text-sm bg-background p-4 max-h-80 overflow-y-auto whitespace-pre-wrap text-text max-w-full">
+              <code>{output}</code>
+            </pre>
+          </motion.div>
+        )}
 
       {isRunning && (
         <div className="mt-2 flex items-center gap-2 text-sm text-blue-600">

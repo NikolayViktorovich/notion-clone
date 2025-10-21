@@ -4,46 +4,63 @@ import { TextBlock } from './blocks/TextBlock';
 import { HeaderBlock } from './blocks/HeaderBlock';
 import { SortableBlock } from './blocks/SortableBlock';
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Type, Heading1, List, Code, Quote, Download, ChevronLeft } from 'lucide-react';
+import { Plus, Type, Heading1, List, Code, Quote, Download, ChevronLeft, Menu } from 'lucide-react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable, DndContext, DragEndEvent, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import { TodoBlock } from './blocks/TodoBlock';
 import { AdvancedCodeBlock } from './blocks/AdvancedCodeBlock';
 import { QuoteBlock } from './blocks/QuoteBlock';
-import { UndoRedo } from './ui/UndoRedo';
 import { formatDate } from '../utils/dateUtils';
 import { GoogleDriveManager } from './google/GoogleDriveManager';
 import { useNavigate } from 'react-router-dom';
+import { Modal } from './ui/Modal';
+import { useStore as useAppStore } from '../store/useStore';
+import { UndoRedo } from './ui/UndoRedo';
 
 export const Editor = () => {
-  const { currentPage, updatePage, createBlock, moveBlock } = useStore();
+  const { 
+    currentPage, 
+    updatePage, 
+    createBlock, 
+    moveBlock, 
+    deleteBlock 
+  } = useStore();
+  const { sidebarOpen, setSidebarOpen } = useAppStore();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [title, setTitle] = useState('');
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [deleteBlockModal, setDeleteBlockModal] = useState<{
+    isOpen: boolean;
+    blockId: string | null;
+    blockPreview: string;
+  }>({
+    isOpen: false,
+    blockId: null,
+    blockPreview: '',
+  });
+  
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const blockMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  
+  const [blockCount, setBlockCount] = useState(0);
+  const [previousPageId, setPreviousPageId] = useState<string | null>(null);
 
   const { setNodeRef } = useDroppable({
     id: 'editor-drop-area',
   });
 
-  const fastTransition = {
-    type: "tween" as const,
-    duration: 0.08,
-    ease: "easeOut" as const
-  };
-
-  const microTransition = {
-    type: "tween" as const,
-    duration: 0.05,
-    ease: "linear" as const
-  };
-
   useEffect(() => {
     if (currentPage) {
       setTitle(currentPage.title);
+      
+      const isPageChange = previousPageId !== currentPage.id;
+      setPreviousPageId(currentPage.id);
+      
+      if (isPageChange) {
+        setBlockCount(currentPage.blocks.length);
+      }
     }
   }, [currentPage]);
 
@@ -143,6 +160,29 @@ export const Editor = () => {
     }
   };
 
+  const openDeleteBlockModal = (blockId: string, blockPreview: string) => {
+    setDeleteBlockModal({
+      isOpen: true,
+      blockId,
+      blockPreview,
+    });
+  };
+
+  const closeDeleteBlockModal = () => {
+    setDeleteBlockModal({
+      isOpen: false,
+      blockId: null,
+      blockPreview: '',
+    });
+  };
+
+  const handleDeleteBlockConfirm = () => {
+    if (deleteBlockModal.blockId) {
+      deleteBlock(deleteBlockModal.blockId);
+      closeDeleteBlockModal();
+    }
+  };
+
   const blockTypes = [
     { type: 'text' as const, icon: Type, label: 'Текст' },
     { type: 'heading' as const, icon: Heading1, label: 'Заголовок' },
@@ -153,63 +193,109 @@ export const Editor = () => {
 
   if (!currentPage) {
     return (
-      <div className="flex items-center justify-center h-full w-full bg-background">
-        <div className="text-center">
+      <motion.div 
+        className="flex items-center justify-center h-full w-full bg-background"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="text-center px-4">
           <div className="w-16 h-16 bg-hover rounded-lg mx-auto mb-4 flex items-center justify-center">
             <Plus className="w-8 h-8 text-text-secondary" />
           </div>
-          <h2 className="text-2xl font-bold text-text mb-2">
+          <h2 className="text-xl font-bold text-text mb-2">
             Страница не выбрана
           </h2>
-          <p className="text-text-secondary">
+          <p className="text-text-secondary text-sm">
             Выберите страницу на боковой панели или создайте новую
           </p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
+  const shouldAnimateBlocks = currentPage.blocks.length !== blockCount;
+  const isNewPage = previousPageId !== currentPage.id;
+
   return (
-    <div className="flex-1 overflow-y-auto bg-background min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
-        <div className="lg:hidden mb-4">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-text hover:bg-hover rounded-lg transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Назад к страницам
-          </button>
-        </div>
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 lg:mb-8">
-          <UndoRedo />
-          <div className="flex gap-2 flex-wrap">
-            <GoogleDriveManager />
-            <button
-              onClick={handleExportPage}
-              className="flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button flex-1 sm:flex-none justify-center"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Экспорт страницы</span>
-              <span className="sm:hidden">Экспорт</span>
-            </button>
+    <motion.div 
+      className="flex-1 overflow-y-auto bg-background min-h-screen safe-area-inset-bottom"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 lg:py-8">
+        {/* Mobile Header */}
+        <div className="lg:hidden mb-3">
+          <div className="flex items-center justify-between">
+            <UndoRedo />
+            <div className="flex items-center gap-2">
+              <GoogleDriveManager />
+              <button
+                onClick={handleExportPage}
+                className="flex items-center gap-1 px-2 py-2 bg-accent text-white rounded-lg text-sm hover:opacity-90 transition-colors shadow-sm special-theme-button"
+                title="Экспорт"
+              >
+                <Download className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Обложка */}
-        {currentPage.cover && (
-          <img
-            src={currentPage.cover}
-            alt="Cover"
-            className="w-full h-32 sm:h-48 object-cover rounded-lg mb-6 lg:mb-8 border border-border"
-          />
-        )}
+        {/* Desktop Header Actions */}
+        <motion.div 
+          className="hidden lg:flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4 lg:mb-6"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex gap-2 flex-wrap">
+            <UndoRedo />
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <GoogleDriveManager />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleExportPage}
+              className="flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button"
+            >
+              <Download className="w-4 h-4" />
+              <span>Экспорт страницы</span>
+            </motion.button>
+          </div>
+        </motion.div>
 
-        {/* Иконка и заголовок страницы */}
-        <div className="flex items-start gap-3 lg:gap-4 mb-8 lg:mb-12">
-          <button className="text-2xl lg:text-4xl mt-1 hover:bg-hover rounded-lg p-1 lg:p-2 transition-colors text-text flex-shrink-0">
+        {/* Page Cover */}
+        <AnimatePresence>
+          {currentPage.cover && (
+            <motion.img
+              key="page-cover"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              src={currentPage.cover}
+              alt="Cover"
+              className="w-full h-20 sm:h-28 md:h-36 lg:h-44 object-cover rounded-lg mb-3 sm:mb-4 lg:mb-6 border border-border"
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Page Icon and Title */}
+        <motion.div 
+          className="flex items-start gap-4 lg:gap-4 mb-6 lg:mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            duration: 0.3,
+            type: "spring",
+            stiffness: 100
+          }}
+        >
+          <div className="text-3xl sm:text-3xl lg:text-4xl mt-1 flex-shrink-0">
             {currentPage.icon || '📄'}
-          </button>
+          </div>
           
           <div className="flex-1 min-w-0">
             {isEditingTitle ? (
@@ -219,7 +305,7 @@ export const Editor = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 onBlur={handleTitleSave}
                 onKeyDown={handleTitleKeyDown}
-                className="w-full text-2xl lg:text-4xl font-bold resize-none border-none outline-none bg-transparent leading-tight text-text placeholder-text-secondary"
+                className="w-full text-2xl sm:text-2xl lg:text-4xl font-bold resize-none border-none outline-none bg-transparent leading-tight text-text placeholder-text-secondary"
                 style={{ minHeight: '1.5em' }}
                 rows={1}
                 placeholder="Untitled"
@@ -227,22 +313,22 @@ export const Editor = () => {
             ) : (
               <h1
                 onClick={() => setIsEditingTitle(true)}
-                className="text-2xl lg:text-4xl font-bold outline-none cursor-text hover:bg-hover rounded-lg px-2 lg:px-3 py-1 lg:py-2 -mx-2 lg:-mx-3 leading-tight text-text break-words"
+                className="w-full text-2xl sm:text-2xl lg:text-4xl font-bold outline-none cursor-text hover:bg-hover rounded-lg px-3 lg:px-3 py-2 lg:py-2 -mx-3 lg:-mx-3 leading-tight text-text break-words"
               >
                 {currentPage.title || 'Untitled'}
               </h1>
             )}
             
-            {/* Мета */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-text-secondary text-xs lg:text-sm mt-2">
-              <span>Создано: {formatDate(currentPage.createdAt)}</span>
-              <span className="hidden sm:inline">•</span>
-              <span>Обновлено: {formatDate(currentPage.updatedAt)}</span>
+            {/* Page metadata */}
+            <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3 text-text-secondary text-sm mt-3">
+              <span className="text-sm">Создано: {formatDate(currentPage.createdAt)}</span>
+              <span className="hidden xs:inline">•</span>
+              <span className="text-sm">Обновлено: {formatDate(currentPage.updatedAt)}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Drag & Drop */}
+        {/* Blocks with Drag & Drop */}
         <div key={currentPage.id}>
           <DndContext
             collisionDetection={closestCenter}
@@ -254,17 +340,34 @@ export const Editor = () => {
                 items={currentPage.blocks.map(block => block.id)} 
                 strategy={verticalListSortingStrategy}
               >
-                <AnimatePresence>
+                <AnimatePresence mode="popLayout" onExitComplete={() => setBlockCount(currentPage.blocks.length)}>
                   {currentPage.blocks.map((block, index) => (
                     <motion.div
                       key={block.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={microTransition}
                       layout
+                      initial={shouldAnimateBlocks || isNewPage ? { opacity: 0, y: 20, scale: 0.95 } : false}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ 
+                        opacity: 0, 
+                        y: -20, 
+                        scale: 0.95,
+                        transition: { duration: 0.2 }
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                        mass: 1,
+                        delay: shouldAnimateBlocks || isNewPage ? index * 0.05 : 0
+                      }}
                     >
-                      <SortableBlock key={block.id} block={block} index={index} isDragging={activeId === block.id}>
+                      <SortableBlock 
+                        key={block.id} 
+                        block={block} 
+                        index={index} 
+                        isDragging={activeId === block.id}
+                        onDeleteClick={openDeleteBlockModal}
+                      >
                         {block.type === 'text' && <TextBlock block={block} />}
                         {block.type === 'heading' && <HeaderBlock block={block} level={1} />}
                         {block.type === 'todo' && <TodoBlock block={block} />}
@@ -279,52 +382,82 @@ export const Editor = () => {
           </DndContext>
         </div>
 
-        {/* Добавление меню */}
+        {/* Add Block Menu */}
         <div className="relative" ref={blockMenuRef}>
-          {showBlockMenu ? (
+          <AnimatePresence mode="wait">
+            {showBlockMenu ? (
+
             <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={fastTransition}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 p-4 sm:p-6 bg-hover rounded-xl border border-border mb-6"
-            >
-              {blockTypes.map(({ type, icon: Icon, label }) => (
-                <button
-                  key={type}
-                  onClick={() => handleAddBlock(type)}
-                  className="flex items-center gap-3 p-3 sm:p-4 bg-background rounded-lg border border-border text-text hover:border-accent hover:shadow-sm transition-all text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="font-medium">{label}</span>
-                </button>
-              ))}
-            </motion.div>
-          ) : (
-            <button
-              onClick={() => setShowBlockMenu(true)}
-              className="w-full p-4 sm:p-6 border-2 border-dashed border-border rounded-xl text-text-secondary hover:text-text hover:border-accent transition-all flex items-center justify-center gap-2 sm:gap-3 hover:bg-hover text-sm sm:text-base"
-            >
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="font-medium">Добавить блок</span>
-            </button>
-          )}
+            key="block-menu"
+            initial={{ opacity: 0, y: 5, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="grid grid-cols-1 xs:grid-cols-2 gap-2 lg:gap-2 p-3 lg:p-4 bg-hover rounded-xl border border-border mb-3 lg:mb-4"
+          >
+            {blockTypes.map(({ type, icon: Icon, label }) => (
+              <button
+                key={type}
+                onClick={() => handleAddBlock(type)}
+                className="flex items-center gap-2 xs:gap-2 lg:gap-3 p-2 lg:p-3 bg-background rounded-lg border border-border text-text hover:border-accent hover:shadow-sm transition-all text-sm"
+              >
+                <Icon className="w-4 h-4 flex-shrink-0" />
+                <span className="font-medium text-sm">{label}</span>
+              </button>
+            ))}
+          </motion.div>
+            ) : (
+              <motion.button
+                key="add-block-button"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowBlockMenu(true)}
+                className="w-full p-3 border-2 border-dashed border-border rounded-xl text-text-secondary hover:text-text hover:border-accent transition-all flex items-center justify-center gap-2 hover:bg-hover text-xs"
+              >
+                <Plus className="w-3 h-3" />
+                <span className="font-medium">Добавить блок</span>
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Пустое состояние */}
-        {currentPage.blocks.length === 0 && !showBlockMenu && (
-          <div className="text-center py-8 lg:py-16">
-            <div className="mb-4 lg:mb-6">
-              <button
-                onClick={() => setShowBlockMenu(true)}
-                className="px-6 py-3 lg:px-8 lg:py-4 bg-accent text-white rounded-xl text-sm lg:text-base font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button hover:scale-[1.02] active:scale-[0.98]"
-              >
-                + Создайте свой первый блок
-              </button>
-            </div>
-            <p className="text-text-secondary text-xs lg:text-sm">Начните создавать свою страницу с помощью блоков контента</p>
-          </div>
-        )}
+        {/* Empty State */}
+        <AnimatePresence>
+          {currentPage.blocks.length === 0 && !showBlockMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="text-center py-6 lg:py-12 px-4"
+            >
+              <div className="mb-3 lg:mb-4">
+                <button
+                  onClick={() => setShowBlockMenu(true)}
+                  className="px-3 py-2 lg:px-4 lg:py-3 bg-accent text-white rounded-xl text-xs lg:text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button"
+                >
+                  + Создайте свой первый блок
+                </button>
+              </div>
+              <p className="text-text-secondary text-xs">Начните создавать свою страницу с помощью блоков контента</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+
+      {/* Модальное окно удаления блока */}
+      <Modal
+        isOpen={deleteBlockModal.isOpen}
+        onClose={closeDeleteBlockModal}
+        onConfirm={handleDeleteBlockConfirm}
+        title="Удалить блок"
+        description={`Вы уверены что хотите удалить блок "${deleteBlockModal.blockPreview}"?`}
+        confirmText="Удалить"
+        type="delete"
+      />
+    </motion.div>
   );
 };

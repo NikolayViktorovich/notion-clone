@@ -3,17 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FileText, ArrowRight, X } from 'lucide-react';
 import { useStore } from '../../../store/useStore';
 
+interface EnhancedSearchProps {
+  onSelect?: () => void;
+}
+
 interface SearchMatch {
   text: string;
   start: number;
   end: number;
 }
 
-export const EnhancedSearch = () => {
+export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const { searchContent, setCurrentPage } = useStore();
-  
+
   const results = useMemo(() => {
     return searchContent(query);
   }, [query, searchContent]);
@@ -22,14 +26,20 @@ export const EnhancedSearch = () => {
     setCurrentPage(pageId);
     setIsOpen(false);
     setQuery('');
+    if (onSelect) onSelect();
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (onSelect) onSelect();
   };
 
   const highlightText = (text: string, matches: SearchMatch[]) => {
     if (!matches.length) return text;
-    
+
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
-    
+
     matches.forEach((match, index) => {
       if (match.start > lastIndex) {
         elements.push(
@@ -38,16 +48,16 @@ export const EnhancedSearch = () => {
           </span>
         );
       }
-      
+
       elements.push(
         <mark key={`match-${index}`} className="bg-yellow-200 px-1 rounded">
           {text.substring(match.start, match.end)}
         </mark>
       );
-      
+
       lastIndex = match.end;
     });
-    
+
     if (lastIndex < text.length) {
       elements.push(
         <span key="after">
@@ -55,7 +65,7 @@ export const EnhancedSearch = () => {
         </span>
       );
     }
-    
+
     return elements;
   };
 
@@ -71,7 +81,7 @@ export const EnhancedSearch = () => {
         <kbd className="text-xs bg-background border border-border rounded px-1.5 py-0.5 text-text-secondary">Ctrl+K</kbd>
       </button>
 
-      {/* Модальное окно поиска */}
+      {/* Модальное окно */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -79,7 +89,7 @@ export const EnhancedSearch = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-20"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
@@ -100,7 +110,7 @@ export const EnhancedSearch = () => {
                   autoFocus
                 />
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   className="absolute right-6 top-1/2 transform -translate-y-1/2 p-1 hover:bg-hover rounded"
                 >
                   <X className="w-5 h-5 text-text-secondary" />

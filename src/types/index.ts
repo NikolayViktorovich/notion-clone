@@ -92,6 +92,14 @@ export interface AppSettings {
   reducedMotion: boolean;
 }
 
+// ДОБАВЛЯЕМ интерфейс для полного снапшота состояния
+export interface AppSnapshot {
+  workspaces: Workspace[];
+  currentWorkspace: Workspace | null;
+  currentPage: Page | null;
+  sidebarOpen: boolean;
+}
+
 const initialColors = {
   light: {
     primary: '#000000',
@@ -118,4 +126,3 @@ const initialColors = {
     buttonText: '#000000',
   },
 };
-
