@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './components/sidebar/Sidebar';
 import { Editor } from './components/Editor';
 import { useStore } from './store/useStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { ThemeToggle } from './components/theme/ThemeToggle';
 import { EnhancedSearch } from './components/comments/search/EnhancedSearch';
@@ -20,40 +20,41 @@ function App() {
   const [appLoaded, setAppLoaded] = useState(false);
   const [themeKey, setThemeKey] = useState(0);
 
-useEffect(() => {
-  const theme = themes.find(t => t.id === currentTheme);
-  if (theme) {
-    applyThemeToDocument(theme);
-    setThemeKey(prev => prev + 1);
-  }
-  initializeOffline();
-}, [currentTheme, initializeOffline, themes]);
+  const initializeApp = useCallback(() => {
+    const theme = themes.find(t => t.id === currentTheme);
+    if (theme) {
+      applyThemeToDocument(theme);
+      setThemeKey(prev => prev + 1);
+    }
+    initializeOffline();
+    if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
+      createPage('default', {
+        title: 'Welcome to Notion Clone',
+        blocks: [
+          {
+            id: crypto.randomUUID(),
+            type: 'text',
+            content: 'This is a simple text block. Click to edit!',
+            children: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            id: crypto.randomUUID(),
+            type: 'heading',
+            content: 'This is a heading',
+            children: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+    }
+  }, [currentTheme, themes, initializeOffline, workspaces, createPage]);
 
-    useEffect(() => {
-      if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
-        createPage('default', {
-          title: 'Добро пожаловать в Notion Clone',
-          blocks: [
-            {
-              id: crypto.randomUUID(),
-              type: 'text',
-              content: 'Это простой текстовый блок. Нажмите, чтобы редактировать!',
-              children: [],
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
-            {
-              id: crypto.randomUUID(),
-              type: 'heading',
-              content: 'Это заголовок',
-              children: [],
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
-          ],
-        });
-      }
-    }, [workspaces, createPage]);
+useEffect(() => {
+  initializeApp();
+}, [initializeApp]);
 
   if (!appLoaded) {
     return <Loading onLoadComplete={() => setAppLoaded(true)} />;
