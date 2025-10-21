@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
 
+Object.defineProperty(global, 'crypto', {
+  value: {
+    randomUUID: () => 'mock-uuid-' + Math.random().toString(36).substr(2, 9),
+  },
+});
+
 const indexedDB = {
   open: jest.fn(() => ({
     onupgradeneeded: null,
