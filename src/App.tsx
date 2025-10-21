@@ -20,37 +20,37 @@ function App() {
   const [appLoaded, setAppLoaded] = useState(false);
   const [themeKey, setThemeKey] = useState(0);
 
-  useEffect(() => {
-    const theme = themes.find(t => t.id === currentTheme);
-    if (theme) {
-      applyThemeToDocument(theme);
-      setThemeKey(prev => prev + 1);
-    }
-    initializeOffline();
-    if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
-      createPage('default', {
-        title: 'Welcome to Notion Clone',
-        blocks: [
-          {
-            id: crypto.randomUUID(),
-            type: 'text',
-            content: 'This is a simple text block. Click to edit!',
-            children: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: crypto.randomUUID(),
-            type: 'heading',
-            content: 'This is a heading',
-            children: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      });
-    }
-  }, [currentTheme]);
+useEffect(() => {
+  const theme = themes.find(t => t.id === currentTheme);
+  if (theme) {
+    applyThemeToDocument(theme);
+    setThemeKey(prev => prev + 1);
+  }
+  initializeOffline();
+  if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
+    createPage('default', {
+      title: 'Welcome to Notion Clone',
+      blocks: [
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          content: 'This is a simple text block. Click to edit!',
+          children: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: crypto.randomUUID(),
+          type: 'heading',
+          content: 'This is a heading',
+          children: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+  }
+}, [currentTheme, createPage, initializeOffline, themes, workspaces]);
 
   if (!appLoaded) {
     // Если приложение ещё не загружено — показываем лоадер

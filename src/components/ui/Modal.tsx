@@ -49,7 +49,7 @@ export const Modal = ({
       document.body.style.overflow = 'unset';
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [isOpen]);
+  }, [isOpen, handleEscapeKey]);
 
   return (
     <AnimatePresence>

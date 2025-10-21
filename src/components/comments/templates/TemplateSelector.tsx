@@ -13,7 +13,6 @@ interface TemplateSelectorProps {
 
 export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: TemplateSelectorProps) => {
   const { templates } = useStore();
-  const { currentTheme } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
