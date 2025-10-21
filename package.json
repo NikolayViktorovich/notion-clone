@@ -35,11 +35,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 100",
     "lint:fix": "eslint . --ext ts,tsx --fix --max-warnings 100"
   },
-    "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "jsdom",
+  "jest": {
     "transformIgnorePatterns": [
-      "node_modules/(?!superjson)"
+      "node_modules/(?!(superjson)/)"
     ],
     "moduleNameMapping": {
       "^react-router-dom$": "<rootDir>/node_modules/react-router-dom"
