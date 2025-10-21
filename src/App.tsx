@@ -53,7 +53,7 @@ function App() {
         ],
       });
     }
-  }, [workspaces, createPage, initializeOffline]); // Добавил workspaces в зависимости
+  }, [workspaces, createPage, initializeOffline]);
 
   const handleAppLoad = () => {
     setAppLoaded(true);
@@ -68,7 +68,7 @@ function App() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 1.0 }}
           >
             <Router>
               <div className="flex h-screen bg-background">
@@ -81,7 +81,7 @@ function App() {
                       exit={{ x: -320, opacity: 0 }}
                       transition={{ 
                         type: "tween",
-                        duration: 0.2,
+                        duration: 0.5,
                         ease: "easeInOut" as const
                       }}
                       className="hidden lg:block w-80 flex-shrink-0"

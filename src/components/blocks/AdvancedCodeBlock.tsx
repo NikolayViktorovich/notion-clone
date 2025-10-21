@@ -665,7 +665,13 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
           className="cursor-text font-mono text-sm bg-background border border-border rounded-lg p-4 whitespace-pre-wrap hover:bg-hover transition-colors min-h-[200px] relative text-text"
         >
           <code className="language-javascript">
-            {content || <span className="text-text-secondary">// Click to write code...\n// Use templates from settings for quick start</span>}
+            {content || (
+              <span className="text-text-secondary">
+                {/* Click to write code... */}
+                {/* Use templates from settings for quick start */}
+                Click to write code...\nUse templates from settings for quick start
+              </span>
+            )}
           </code>
         </pre>
       )}
