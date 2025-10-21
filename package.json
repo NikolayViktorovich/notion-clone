@@ -35,6 +35,16 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 100",
     "lint:fix": "eslint . --ext ts,tsx --fix --max-warnings 100"
   },
+    "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "transformIgnorePatterns": [
+      "node_modules/(?!superjson)"
+    ],
+    "moduleNameMapping": {
+      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom"
+    }
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -53,6 +63,7 @@
       "last 1 safari version"
     ]
   },
+  
   "devDependencies": {
     "@types/node": "^24.7.2",
     "autoprefixer": "^10.4.21",
