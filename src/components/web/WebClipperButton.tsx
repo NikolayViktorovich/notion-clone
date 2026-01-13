@@ -1,4 +1,3 @@
-// components/web/WebClipperButton.tsx
 import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
 import { useWebClipper } from '../../hooks/useWebClipper';

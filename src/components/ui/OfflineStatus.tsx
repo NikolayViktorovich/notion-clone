@@ -34,11 +34,11 @@ export const OfflineStatus = () => {
         disabled={isSyncing || isSuccess}
         className={`
           flex items-center justify-center w-8 h-8 rounded-lg
-          transition-all duration-300 border
+          transition-all duration-150 border
           ${isSuccess 
             ? 'bg-green-500 text-white border-green-600 cursor-default scale-110' 
             : isSyncing
-            ? 'bg-blue-100 text-blue-700 border-blue-200 cursor-wait dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800'
+            ? 'bg-hover text-text-secondary border-border cursor-wait'
             : 'special-theme-button hover:scale-105 active:scale-95'
           }
         `}

@@ -30,8 +30,8 @@ export const CommentSystem = ({ blockId }: CommentSystemProps) => {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
           comments.length > 0
-            ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            ? 'bg-hover text-text hover:bg-border'
+            : 'bg-hover text-text-secondary hover:bg-border'
         }`}
       >
         <MessageCircle className="w-3 h-3" />
@@ -45,14 +45,14 @@ export const CommentSystem = ({ blockId }: CommentSystemProps) => {
             initial={{ opacity: 0, x: 10, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 10, scale: 0.95 }}
-            className="absolute right-0 top-8 z-50 w-80 bg-white border border-gray-200 rounded-lg shadow-xl"
+            className="absolute right-0 top-8 z-50 w-80 bg-background border border-border rounded-lg shadow-xl"
           >
             {/* Заголовок */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900">Комментарии</h3>
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="font-semibold text-text">Комментарии</h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-hover rounded text-text-secondary"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -61,7 +61,7 @@ export const CommentSystem = ({ blockId }: CommentSystemProps) => {
             {/* Список комментариев */}
             <div className="max-h-64 overflow-y-auto p-4">
               {comments.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-4">
+                <p className="text-sm text-text-secondary text-center py-4">
                   Пока нет комментариев
                 </p>
               ) : (
@@ -79,19 +79,19 @@ export const CommentSystem = ({ blockId }: CommentSystemProps) => {
             </div>
 
             {/* Форма нового комментария */}
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t border-border">
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Добавить комментарий..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-background text-text"
                 rows={3}
               />
               <div className="flex justify-end mt-2">
                 <button
                   onClick={handleAddComment}
                   disabled={!newComment.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 bg-accent text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors special-theme-button"
                 >
                   Добавить
                 </button>

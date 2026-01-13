@@ -621,7 +621,7 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
                 <button
                   key={index}
                   onClick={() => insertTemplate(template.code)}
-                  className="w-full text-left p-2 text-xs bg-background border border-border rounded hover:border-accent transition-colors min-w-0"
+                  className="w-full text-left p-2 text-xs bg-background border border-border rounded hover:border-text transition-colors min-w-0"
                 >
                   <div className="font-medium text-text truncate">{template.name}</div>
                   <div className="text-text-secondary text-xs mt-1 truncate">
@@ -715,8 +715,8 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         )}
 
       {isRunning && (
-        <div className="mt-2 flex items-center gap-2 text-sm text-blue-600">
-          <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="mt-2 flex items-center gap-2 text-sm text-text-secondary">
+          <div className="w-3 h-3 border-2 border-text-secondary border-t-transparent rounded-full animate-spin" />
           Выполнение JavaScript...
         </div>
       )}

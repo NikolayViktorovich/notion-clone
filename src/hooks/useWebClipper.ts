@@ -1,4 +1,3 @@
-// hooks/useWebClipper.ts
 import { create } from 'zustand';
 import { WebClip, WebClipRequest } from '../types/webClipper';
 import { useStore } from '../store/useStore';

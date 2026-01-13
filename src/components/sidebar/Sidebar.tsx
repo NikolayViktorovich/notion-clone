@@ -107,7 +107,7 @@ export const Sidebar = ({ onMobileClose, isSidebarOpen }: SidebarProps) => {
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
             className="fixed lg:static inset-y-0 left-0 w-80 bg-sidebar border-r border-border h-screen flex flex-col z-50"
           >
             {/* Хэдер */}
@@ -166,24 +166,24 @@ export const Sidebar = ({ onMobileClose, isSidebarOpen }: SidebarProps) => {
                     {filteredPages.map((page) => (
                       <motion.div
                         key={page.id}
-                        initial={{ opacity: 0, y: -10 }}
+                        initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.15 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        transition={{ duration: 0.1 }}
                         className={`px-3 py-2 lg:py-3 rounded-lg flex items-center gap-3 transition-all group cursor-pointer ${
-                          currentPage?.id === page.id ? 'bg-accent text-white shadow-sm special-theme-button' : 'hover:bg-hover text-text'
+                          currentPage?.id === page.id ? 'bg-accent shadow-sm special-theme-button' : 'hover:bg-hover text-text'
                         }`}
                         onClick={() => handlePageSelect(page.id)}
                       >
                         <span className="text-lg flex-shrink-0">{page.icon || '📄'}</span>
                         <div className="flex-1 min-w-0">
                           <p className={`text-sm font-medium truncate ${
-                            currentPage?.id === page.id ? 'text-white' : 'text-text'
+                            currentPage?.id === page.id ? '' : 'text-text'
                           }`}>
                             {page.title || 'Untitled'}
                           </p>
                           <p className={`text-xs ${
-                            currentPage?.id === page.id ? 'text-gray-200' : 'text-text-secondary'
+                            currentPage?.id === page.id ? 'opacity-70' : 'text-text-secondary'
                           }`}>
                             {formatDate(page.updatedAt)}
                           </p>
@@ -195,7 +195,7 @@ export const Sidebar = ({ onMobileClose, isSidebarOpen }: SidebarProps) => {
                             onClick={(e) => handleMenuToggle(page.id, e)}
                             className={`p-1 rounded transition-colors ${
                               currentPage?.id === page.id 
-                                ? 'text-white hover:bg-white/20' 
+                                ? 'opacity-70 hover:opacity-100' 
                                 : 'text-text-secondary hover:bg-hover-secondary hover:text-text'
                             }`}
                           >
@@ -206,10 +206,10 @@ export const Sidebar = ({ onMobileClose, isSidebarOpen }: SidebarProps) => {
                           <AnimatePresence>
                             {activeMenu === page.id && (
                               <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                initial={{ opacity: 0, scale: 0.95, y: -5 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                transition={{ duration: 0.15 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                                transition={{ duration: 0.1 }}
                                 className="absolute right-0 top-full mt-1 w-32 bg-background border border-border rounded-lg shadow-lg z-10 py-1"
                               >
                                 <button

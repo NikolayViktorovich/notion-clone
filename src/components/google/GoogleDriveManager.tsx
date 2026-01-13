@@ -110,7 +110,6 @@ export const GoogleDriveManager = () => {
 
   return (
     <div className="relative">
-      {/* Кастомное уведомление */}
       <Notification
         message={notification.message}
         type={notification.type}
@@ -119,7 +118,6 @@ export const GoogleDriveManager = () => {
         duration={5000}
       />
 
-      {/* Кнопка управления Google Drive */}
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -133,7 +131,6 @@ export const GoogleDriveManager = () => {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -142,7 +139,6 @@ export const GoogleDriveManager = () => {
               onClick={() => setIsOpen(false)}
             />
             
-            {/* Dropdown Menu */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -150,7 +146,6 @@ export const GoogleDriveManager = () => {
               className="absolute right-0 top-12 z-50 w-80 bg-background border border-border rounded-lg shadow-xl p-4"
             >
               {!isAuthenticated ? (
-                // Не авторизован
                 <div className="space-y-3">
                   <div className="text-center">
                     <Cloud className="w-12 h-12 mx-auto mb-2 text-text-secondary" />
@@ -165,10 +160,10 @@ export const GoogleDriveManager = () => {
                   <button
                     onClick={handleSignIn}
                     disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-accent rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50 special-theme-button"
                   >
                     {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <User className="w-4 h-4" />
                     )}
@@ -177,7 +172,6 @@ export const GoogleDriveManager = () => {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {/* Информация о пользователе */}
                   <div className="flex items-center gap-3 p-2 bg-hover rounded-lg">
                     {user?.picture ? (
                       <img
@@ -204,7 +198,6 @@ export const GoogleDriveManager = () => {
                     </button>
                   </div>
 
-                  {/* Действия */}
                   <div className="space-y-2">
                     <button
                       onClick={() => setSaveModal(true)}
@@ -225,7 +218,6 @@ export const GoogleDriveManager = () => {
                     </button>
                   </div>
 
-                  {/* Список файлов */}
                   {showFiles && (
                     <div className="border-t border-border pt-3">
                       <h4 className="text-sm font-medium text-text mb-2">
@@ -287,7 +279,6 @@ export const GoogleDriveManager = () => {
         )}
       </AnimatePresence>
 
-      {/* Модальное окно сохранения */}
       <InputModal
         isOpen={saveModal}
         onClose={() => {

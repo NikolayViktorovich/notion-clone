@@ -68,9 +68,8 @@ export interface SearchMatch {
 }
 
 export interface Theme {
-  id: string;
+  id: 'light' | 'dark' | 'blue-dark' | 'warm-light';
   name: string;
-  type: 'light' | 'dark' | 'custom';
   colors: {
     primary: string;
     background: string;

@@ -1,4 +1,3 @@
-// hooks/useGoogleDrive.ts
 import { create } from 'zustand';
 import { GoogleDriveFile, GoogleAuthState, GoogleDriveConfig } from '../types/googleDrive';
 

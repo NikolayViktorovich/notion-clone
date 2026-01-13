@@ -52,7 +52,6 @@ function findPageInWorkspaces(workspaces: Workspace[], pageId: string): Page | n
   return null;
 }
 
-// НОВАЯ ФУНКЦИЯ: Получение полного снапшота состояния
 function getFullAppSnapshot(state: AppState): AppSnapshot {
   return {
     workspaces: cloneState(state.workspaces),
@@ -62,7 +61,6 @@ function getFullAppSnapshot(state: AppState): AppSnapshot {
   };
 }
 
-// Функция для создания начального снапшота
 function createInitialSnapshot(): AppSnapshot {
   return {
     workspaces: [
@@ -84,7 +82,6 @@ function createInitialSnapshot(): AppSnapshot {
 
 export const useStore = create<AppState>()(
   devtools((set, get) => {
-    // Создаем начальный снапшот
     const initialSnapshot = createInitialSnapshot();
     const initialHistory = {
       past: [],
@@ -263,7 +260,6 @@ export const useStore = create<AppState>()(
         set({ offlineStatus: offlineStorage.getStatus() });
       },
 
-      // ИСПРАВЛЕННАЯ ФУНКЦИЯ: Сохраняем полное состояние
       captureHistory: () => {
         const state = get();
         const snapshot = getFullAppSnapshot(state);
@@ -278,7 +274,6 @@ export const useStore = create<AppState>()(
         });
       },
 
-      // ИСПРАВЛЕННАЯ ФУНКЦИЯ: Восстанавливаем полное состояние
       undo: () => {
         const state = get();
         const { past, present, future } = state.history;
@@ -290,7 +285,6 @@ export const useStore = create<AppState>()(
 
         const previousState = deserializeState<AppSnapshot>(previousStateSerialized);
 
-        // ВОССТАНАВЛИВАЕМ ВСЕ КРИТИЧЕСКИЕ СОСТОЯНИЯ
         set({
           workspaces: previousState.workspaces,
           currentWorkspace: previousState.currentWorkspace,
@@ -306,7 +300,6 @@ export const useStore = create<AppState>()(
         state.saveToOffline();
       },
 
-      // ИСПРАВЛЕННАЯ ФУНКЦИЯ: Восстанавливаем полное состояние
       redo: () => {
         const state = get();
         const { past, present, future } = state.history;
@@ -318,7 +311,6 @@ export const useStore = create<AppState>()(
 
         const nextState = deserializeState<AppSnapshot>(nextStateSerialized);
 
-        // ВОССТАНАВЛИВАЕМ ВСЕ КРИТИЧЕСКИЕ СОСТОЯНИЯ
         set({
           workspaces: nextState.workspaces,
           currentWorkspace: nextState.currentWorkspace,
@@ -741,7 +733,6 @@ export const useStore = create<AppState>()(
                   });
                 }
                 
-                // Рекурсивно ищем в дочерних блоках
                 block.children.forEach((child, index) => {
                   searchInBlock(child, `${path} > ${index}`);
                 });

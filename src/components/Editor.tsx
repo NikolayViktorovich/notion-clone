@@ -193,7 +193,7 @@ export const Editor = () => {
         className="flex items-center justify-center h-full w-full bg-background"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.15 }}
       >
         <div className="text-center px-4">
           <div className="w-16 h-16 bg-hover rounded-lg mx-auto mb-4 flex items-center justify-center">
@@ -218,7 +218,7 @@ export const Editor = () => {
       className="flex-1 overflow-y-auto bg-background min-h-screen safe-area-inset-bottom"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.15 }}
     >
       <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 lg:py-8">
         {/* Mobile Header */}
@@ -241,9 +241,9 @@ export const Editor = () => {
         {/* Desktop Header Actions */}
         <motion.div 
           className="hidden lg:flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4 lg:mb-6"
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.15 }}
         >
           <div className="flex gap-2 flex-wrap">
             <UndoRedo />
@@ -267,10 +267,10 @@ export const Editor = () => {
           {currentPage.cover && (
             <motion.img
               key="page-cover"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.15 }}
               src={currentPage.cover}
               alt="Cover"
               className="w-full h-20 sm:h-28 md:h-36 lg:h-44 object-cover rounded-lg mb-3 sm:mb-4 lg:mb-6 border border-border"
@@ -281,12 +281,11 @@ export const Editor = () => {
         {/* Page Icon and Title */}
         <motion.div 
           className="flex items-start gap-4 lg:gap-4 mb-6 lg:mb-6"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ 
-            duration: 0.3,
-            type: "spring",
-            stiffness: 100
+            duration: 0.15,
+            ease: "easeOut"
           }}
         >
           <div className="text-3xl sm:text-3xl lg:text-4xl mt-1 flex-shrink-0">
@@ -341,20 +340,18 @@ export const Editor = () => {
                     <motion.div
                       key={block.id}
                       layout
-                      initial={shouldAnimateBlocks || isNewPage ? { opacity: 0, y: 20, scale: 0.95 } : false}
+                      initial={shouldAnimateBlocks || isNewPage ? { opacity: 0, y: 10, scale: 0.98 } : false}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ 
                         opacity: 0, 
-                        y: -20, 
-                        scale: 0.95,
-                        transition: { duration: 0.2 }
+                        y: -10, 
+                        scale: 0.98,
+                        transition: { duration: 0.1 }
                       }}
                       transition={{
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 30,
-                        mass: 1,
-                        delay: shouldAnimateBlocks || isNewPage ? index * 0.05 : 0
+                        duration: 0.15,
+                        ease: "easeOut",
+                        delay: shouldAnimateBlocks || isNewPage ? index * 0.02 : 0
                       }}
                     >
                       <SortableBlock 
@@ -385,17 +382,17 @@ export const Editor = () => {
 
             <motion.div
             key="block-menu"
-            initial={{ opacity: 0, y: 5, scale: 0.95 }}
+            initial={{ opacity: 0, y: 3, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 5, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+            exit={{ opacity: 0, y: 3, scale: 0.98 }}
+            transition={{ duration: 0.1 }}
             className="grid grid-cols-1 xs:grid-cols-2 gap-2 lg:gap-2 p-3 lg:p-4 bg-hover rounded-xl border border-border mb-3 lg:mb-4"
           >
             {blockTypes.map(({ type, icon: Icon, label }) => (
               <button
                 key={type}
                 onClick={() => handleAddBlock(type)}
-                className="flex items-center gap-2 xs:gap-2 lg:gap-3 p-2 lg:p-3 bg-background rounded-lg border border-border text-text hover:border-accent hover:shadow-sm transition-all text-sm"
+                className="flex items-center gap-2 xs:gap-2 lg:gap-3 p-2 lg:p-3 bg-background rounded-lg border border-border text-text hover:border-text hover:shadow-sm transition-fast text-sm"
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="font-medium text-sm">{label}</span>
@@ -408,10 +405,10 @@ export const Editor = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={() => setShowBlockMenu(true)}
-                className="w-full p-3 border-2 border-dashed border-border rounded-xl text-text-secondary hover:text-text hover:border-accent transition-all flex items-center justify-center gap-2 hover:bg-hover text-xs"
+                className="w-full p-3 border-2 border-dashed border-border rounded-xl text-text-secondary hover:text-text hover:border-text transition-fast flex items-center justify-center gap-2 hover:bg-hover text-xs"
               >
                 <Plus className="w-3 h-3" />
                 <span className="font-medium">Добавить блок</span>
@@ -424,16 +421,16 @@ export const Editor = () => {
         <AnimatePresence>
           {currentPage.blocks.length === 0 && !showBlockMenu && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.15 }}
               className="text-center py-6 lg:py-12 px-4"
             >
               <div className="mb-3 lg:mb-4">
                 <button
                   onClick={() => setShowBlockMenu(true)}
-                  className="px-3 py-2 lg:px-4 lg:py-3 bg-accent text-white rounded-xl text-xs lg:text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button"
+                  className="px-3 py-2 lg:px-4 lg:py-3 bg-accent text-white rounded-xl text-xs lg:text-sm font-medium hover:opacity-90 transition-fast shadow-sm special-theme-button"
                 >
                   + Создайте свой первый блок
                 </button>

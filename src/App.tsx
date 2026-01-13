@@ -3,13 +3,11 @@ import { Sidebar } from './components/sidebar/Sidebar';
 import { Editor } from './components/Editor';
 import { useStore } from './store/useStore';
 import { useEffect, useState } from 'react';
-import { useTheme } from './hooks/useTheme';
+import { useTheme, applyThemeToDocument } from './hooks/useTheme';
 import { ThemeToggle } from './components/theme/ThemeToggle';
 import { EnhancedSearch } from './components/comments/search/EnhancedSearch';
-import { applyThemeToDocument } from './hooks/useTheme';
 import { WebClipper } from './components/web/WebClipper';
 import { WebClipperButton } from './components/web/WebClipperButton';
-import { Loading } from './components/ui/Loading';
 import { OfflineStatus } from './components/ui/OfflineStatus';
 import { Menu } from 'lucide-react';
 
@@ -17,14 +15,11 @@ function App() {
   const { workspaces, createPage, sidebarOpen, setSidebarOpen, initializeOffline } = useStore();
   const { currentTheme, themes } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [appLoaded, setAppLoaded] = useState(false);
-  const [themeKey, setThemeKey] = useState(0);
 
 useEffect(() => {
   const theme = themes.find(t => t.id === currentTheme);
   if (theme) {
     applyThemeToDocument(theme);
-    setThemeKey(prev => prev + 1);
   }
   initializeOffline();
   if (workspaces.length > 0 && workspaces[0].pages.length === 0) {
@@ -53,12 +48,8 @@ useEffect(() => {
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [currentTheme]);
 
-  if (!appLoaded) {
-    return <Loading onLoadComplete={() => setAppLoaded(true)} />;
-  }
-
   return (
-    <Router key={themeKey}>
+    <Router>
       <div className="flex h-screen bg-background safe-area-inset">
         {/* Desktop Sidebar */}
         {sidebarOpen && (
@@ -118,7 +109,7 @@ useEffect(() => {
           />
         )}
         {/* Mobile Sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 lg:hidden w-80 max-w-[85vw] transform transition-transform duration-300 ease-in-out ${
+        <div className={`fixed inset-y-0 left-0 z-50 lg:hidden w-80 max-w-[85vw] transform transition-transform duration-150 ease-out ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } safe-area-inset-top`}>
           <div className="pt-4 lg:pt-0 h-full">

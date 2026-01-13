@@ -91,14 +91,14 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
                     onClick={() => setSelectedCategory(category.id)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                       selectedCategory === category.id
-                        ? 'bg-accent text-white shadow-sm special-theme-button'
+                        ? 'bg-accent shadow-sm special-theme-button'
                         : 'bg-hover text-text hover:bg-hover-secondary'
                     }`}
                   >
                     {category.name}
                     <span className={`px-1.5 py-0.5 rounded text-xs ${
                       selectedCategory === category.id
-                        ? 'bg-white bg-opacity-20 text-white'
+                        ? 'opacity-70'
                         : 'bg-background text-text-secondary'
                     }`}>
                       {category.count}
@@ -121,15 +121,15 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
                   {filteredTemplates.map((template) => (
                     <motion.button
                       key={template.id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                       onClick={() => handleTemplateSelect(template)}
-                      className="text-left p-4 border border-border rounded-lg hover:border-accent hover:shadow-md transition-all group bg-background text-text"
+                      className="text-left p-4 border border-border rounded-lg hover:border-text hover:shadow-md transition-fast group bg-background text-text"
                     >
                       <div className="flex items-start gap-3 mb-3">
                         <span className="text-2xl flex-shrink-0">{template.icon}</span>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-text group-hover:text-accent transition-colors truncate">
+                          <h3 className="font-semibold text-text transition-colors truncate">
                             {template.name}
                           </h3>
                           <p className="text-sm text-text-secondary mt-1 line-clamp-2">
