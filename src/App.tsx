@@ -51,25 +51,20 @@ useEffect(() => {
   return (
     <Router>
       <div className="flex h-screen bg-background safe-area-inset">
-        {/* Desktop Sidebar */}
         {sidebarOpen && (
           <div className="hidden lg:block w-80 flex-shrink-0">
             <Sidebar isSidebarOpen={sidebarOpen} />
           </div>
         )}
-        {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 w-full">
-        {/* Top Bar */}
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-border bg-background safe-area-inset-top pt-6 lg:pt-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
                 className="lg:hidden p-2 rounded-lg hover:bg-hover transition-colors text-text flex-shrink-0 mt-3"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              {/* Desktop Menu Button */}
                   {!sidebarOpen && (
                     <button
                       onClick={() => setSidebarOpen(true)}
@@ -78,7 +73,6 @@ useEffect(() => {
                       <Menu className="w-5 h-5" />
                     </button>
                   )}
-              {/* Desktop Search */}
               <div className="hidden lg:block flex-1 max-w-2xl">
                 <EnhancedSearch />
               </div>
@@ -92,7 +86,6 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Editor Area */}
           <div className="flex-1 overflow-auto w-full">
             <Routes>
               <Route path="/" element={<Editor />} />
@@ -101,15 +94,13 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Mobile Sidebar Overlay */}
         {isMobileMenuOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
-        {/* Mobile Sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 lg:hidden w-80 max-w-[85vw] transform transition-transform duration-150 ease-out ${
+        <div className={`fixed inset-y-0 left-0 z-50 lg:hidden w-80 max-w-[85vw] transform transition-transform duration-100 ease-out ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } safe-area-inset-top`}>
           <div className="pt-4 lg:pt-0 h-full">
@@ -120,7 +111,6 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Web Clipper Modal */}
         <WebClipper />
       </div>
     </Router>
