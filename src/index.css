@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Clamp-based responsive typography */
 :root {
   --text-xs: clamp(0.65rem, 0.6rem + 0.25vw, 0.75rem);
   --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
@@ -12,13 +11,21 @@
   --text-2xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
   --text-3xl: clamp(1.5rem, 1.25rem + 1.25vw, 1.875rem);
   --text-4xl: clamp(1.75rem, 1.5rem + 1.25vw, 2.25rem);
-  
-  /* Clamp-based spacing */
   --space-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
   --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
   --space-md: clamp(0.75rem, 0.6rem + 0.75vw, 1rem);
   --space-lg: clamp(1rem, 0.8rem + 1vw, 1.5rem);
   --space-xl: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+  --color-primary: #000000;
+  --color-background: #ffffff;
+  --color-sidebar: #fafafa;
+  --color-text: #000000;
+  --color-text-secondary: #666666;
+  --color-border: #e0e0e0;
+  --color-hover: #f5f5f5;
+  --color-accent: #000000;
+  --color-button: #000000;
+  --color-button-text: #ffffff;
 }
 
 .safe-area-inset {
@@ -49,22 +56,7 @@ input, textarea {
   font-size: 16px;
 }
 
-:root {
-  /* Light theme - чисто черно-белая */
-  --color-primary: #000000;
-  --color-background: #ffffff;
-  --color-sidebar: #fafafa;
-  --color-text: #000000;
-  --color-text-secondary: #666666;
-  --color-border: #e0e0e0;
-  --color-hover: #f5f5f5;
-  --color-accent: #000000;
-  --color-button: #000000;
-  --color-button-text: #ffffff;
-}
-
 [data-theme="dark"] {
-  /* Dark theme - чисто черно-белая */
   --color-primary: #ffffff;
   --color-background: #000000;
   --color-sidebar: #0a0a0a;
@@ -78,7 +70,6 @@ input, textarea {
 }
 
 [data-theme="blue-dark"] {
-  /* Blue dark - глубокий синий */
   --color-primary: #e2e8f0;
   --color-background: #0f172a;
   --color-sidebar: #1e293b;
@@ -92,7 +83,6 @@ input, textarea {
 }
 
 [data-theme="warm-light"] {
-  /* Warm light - теплые бежевые тона */
   --color-primary: #44403c;
   --color-background: #faf8f5;
   --color-sidebar: #f5f0e8;
@@ -105,37 +95,14 @@ input, textarea {
   --color-button-text: #ffffff;
 }
 
-.bg-background {
-  background-color: var(--color-background);
-}
-
-.bg-sidebar {
-  background-color: var(--color-sidebar);
-}
-
-.bg-hover {
-  background-color: var(--color-hover);
-}
-
-.text-text {
-  color: var(--color-text);
-}
-
-.text-text-secondary {
-  color: var(--color-text-secondary);
-}
-
-.border-border {
-  border-color: var(--color-border);
-}
-
-.bg-accent {
-  background-color: var(--color-accent);
-}
-
-.text-accent {
-  color: var(--color-accent);
-}
+.bg-background { background-color: var(--color-background); }
+.bg-sidebar { background-color: var(--color-sidebar); }
+.bg-hover { background-color: var(--color-hover); }
+.text-text { color: var(--color-text); }
+.text-text-secondary { color: var(--color-text-secondary); }
+.border-border { border-color: var(--color-border); }
+.bg-accent { background-color: var(--color-accent); }
+.text-accent { color: var(--color-accent); }
 
 .btn-primary {
   background-color: var(--color-button) !important;
@@ -148,11 +115,8 @@ input, textarea {
   border: 1px solid var(--color-border) !important;
 }
 
-.btn-primary:hover {
-  opacity: 0.85;
-}
+.btn-primary:hover { opacity: 0.85; }
 
-/* Специальные стили для кнопок в разных темах */
 [data-theme="light"] .special-theme-button {
   background-color: #000000 !important;
   color: #ffffff !important;
@@ -173,7 +137,6 @@ input, textarea {
   background-color: #e0e0e0 !important;
 }
 
-/* Тёмная тема - переопределение синих цветов на чёрно-белые */
 [data-theme="dark"] .bg-blue-100 { background-color: #222222 !important; }
 [data-theme="dark"] .bg-blue-600 { background-color: #ffffff !important; }
 [data-theme="dark"] .bg-blue-700 { background-color: #e0e0e0 !important; }
@@ -184,18 +147,11 @@ input, textarea {
 [data-theme="dark"] .border-blue-600 { border-color: #ffffff !important; }
 [data-theme="dark"] .hover\:bg-blue-200:hover { background-color: #333333 !important; }
 [data-theme="dark"] .hover\:bg-blue-700:hover { background-color: #cccccc !important; }
-
-/* Тёмная тема - убираем синие бордеры */
 [data-theme="dark"] .border-accent { border-color: #ffffff !important; }
 [data-theme="dark"] .hover\:border-accent:hover { border-color: #ffffff !important; }
 [data-theme="dark"] .focus\:ring-accent:focus { --tw-ring-color: #444444 !important; }
 [data-theme="dark"] .ring-accent { --tw-ring-color: #444444 !important; }
-
-/* Тёмная тема - selection colors */
-[data-theme="dark"] ::selection {
-  background-color: #ffffff;
-  color: #000000;
-}
+[data-theme="dark"] ::selection { background-color: #ffffff; color: #000000; }
 
 [data-theme="blue-dark"] .special-theme-button {
   background-color: #3b82f6 !important;
@@ -218,20 +174,9 @@ input, textarea {
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .touch-callout-none {
-    -webkit-touch-callout: none;
-  }
-  
-  .select-none {
-    -webkit-user-select: none;
-    user-select: none;
-  }
-  
-  /* Clamp typography utilities */
+  .text-balance { text-wrap: balance; }
+  .touch-callout-none { -webkit-touch-callout: none; }
+  .select-none { -webkit-user-select: none; user-select: none; }
   .text-clamp-xs { font-size: var(--text-xs); }
   .text-clamp-sm { font-size: var(--text-sm); }
   .text-clamp-base { font-size: var(--text-base); }
@@ -240,8 +185,6 @@ input, textarea {
   .text-clamp-2xl { font-size: var(--text-2xl); }
   .text-clamp-3xl { font-size: var(--text-3xl); }
   .text-clamp-4xl { font-size: var(--text-4xl); }
-  
-  /* Clamp spacing utilities */
   .p-clamp-sm { padding: var(--space-sm); }
   .p-clamp-md { padding: var(--space-md); }
   .p-clamp-lg { padding: var(--space-lg); }
@@ -253,7 +196,6 @@ input, textarea {
   .mb-clamp-lg { margin-bottom: var(--space-lg); }
 }
 
-/* Оптимизированные анимации - быстрее и плавнее */
 @keyframes pulse-scale {
   0% { transform: scale(0.98); opacity: 0.8; }
   50% { transform: scale(1.01); opacity: 1; }
@@ -275,34 +217,18 @@ input, textarea {
   to { opacity: 1; }
 }
 
-.animate-pulse-scale {
-  animation: pulse-scale 0.25s ease-out;
-}
+.animate-pulse-scale { animation: pulse-scale 0.25s ease-out; }
+.animate-slide-in-right { animation: slide-in-right 0.15s ease-out; }
+.animate-slide-out-right { animation: slide-out-right 0.15s ease-in; }
+.animate-fade-in { animation: fade-in 0.15s ease-out; }
 
-.animate-slide-in-right {
-  animation: slide-in-right 0.15s ease-out;
-}
+.transition-fast { transition: all 0.1s ease-out; will-change: transform, opacity; }
+.transition-normal { transition: all 0.12s ease-out; will-change: transform, opacity; }
+.transition-colors { transition-duration: 0.1s !important; transition-timing-function: ease-out !important; }
+.transition-all { transition-duration: 0.1s !important; transition-timing-function: ease-out !important; }
+.transition-transform { transition-duration: 0.1s !important; transition-timing-function: ease-out !important; }
+.transition-opacity { transition-duration: 0.1s !important; transition-timing-function: ease-out !important; }
 
-.animate-slide-out-right {
-  animation: slide-out-right 0.15s ease-in;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.15s ease-out;
-}
-
-/* GPU-ускоренные переходы */
-.transition-fast {
-  transition: all 0.1s ease-out;
-  will-change: transform, opacity;
-}
-
-.transition-normal {
-  transition: all 0.15s ease-out;
-  will-change: transform, opacity;
-}
-
-/* Reduce motion для пользователей с настройками */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

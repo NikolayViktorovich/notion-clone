@@ -26,7 +26,7 @@ export const ThemeToggle = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.1 }}
+              transition={{ duration: 0.08 }}
               className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
@@ -35,7 +35,7 @@ export const ThemeToggle = () => {
               initial={{ opacity: 0, scale: 0.95, y: -5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -5 }}
-              transition={{ duration: 0.1 }}
+              transition={{ duration: 0.08 }}
               className="absolute right-0 top-12 z-50 w-48 bg-background border border-border rounded-lg shadow-xl overflow-hidden"
             >
               {themes.map((theme) => (

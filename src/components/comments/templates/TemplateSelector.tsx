@@ -44,17 +44,18 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.08 }}
           className="fixed inset-0 z-[100] flex items-center justify-center p-0 lg:p-4 bg-black/50 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.1, ease: "easeOut" }}
             className="bg-sidebar w-full h-full lg:w-full lg:max-w-6xl lg:h-auto lg:max-h-[90vh] flex flex-col lg:rounded-xl shadow-2xl border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Заголовок */}
             <div className="flex items-center justify-between p-4 lg:p-6 border-b border-border safe-area-inset-top">
               <div className="flex items-center gap-3">
                 <LayoutTemplate className="w-6 h-6 text-text" />
@@ -71,7 +72,6 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
               </button>
             </div>
 
-            {/* Поиск и фильтры */}
             <div className="p-4 lg:p-6 border-b border-border">
               <div className="relative mb-4">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary" />
@@ -108,7 +108,6 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
               </div>
             </div>
 
-            {/* Сетка шаблонов */}
             <div className="flex-1 overflow-y-auto p-4 lg:p-6 safe-area-inset-bottom">
               {filteredTemplates.length === 0 ? (
                 <div className="text-center py-12 text-text-secondary">

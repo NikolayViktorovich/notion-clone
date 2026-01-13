@@ -61,7 +61,6 @@ export const SortableBlock = ({
       className={`group relative mb-3 ${dndIsDragging ? 'z-50' : ''}`}
     >
       <div className="flex items-start gap-3 p-2 hover:bg-hover rounded-lg transition-colors">
-        {/* Перетаскивание ручки */}
         <motion.div
           {...attributes}
           {...listeners}
@@ -71,12 +70,10 @@ export const SortableBlock = ({
           <GripVertical className="w-4 h-4 text-text-secondary" />
         </motion.div>
 
-        {/* Block Content */}
         <div className="flex-1">
           {children}
         </div>
 
-        {/* Удалить */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={handleDeleteClick}

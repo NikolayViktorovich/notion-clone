@@ -121,13 +121,15 @@ export const WebClipper = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: 0.08 }}
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
         onClick={closeClipper}
       >
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          transition={{ duration: 0.1, ease: "easeOut" }}
           className="bg-background border border-border rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
@@ -151,9 +153,7 @@ export const WebClipper = () => {
             </button>
           </div>
 
-          {/* Контент */}
           <div className="p-6 overflow-y-auto max-h-[60vh]">
-            {/* URL ввод */}
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-text mb-2">
@@ -191,7 +191,6 @@ export const WebClipper = () => {
               </button>
             </div>
 
-            {/* Превью */}
             {currentClip && (
               <div className="space-y-4">
                 <div>
@@ -248,7 +247,6 @@ export const WebClipper = () => {
             )}
           </div>
 
-          {/* Действия */}
           <div className="flex justify-end gap-3 p-6 border-t border-border bg-hover">
             <button
               onClick={closeClipper}

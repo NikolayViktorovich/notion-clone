@@ -71,7 +71,6 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
 
   return (
     <>
-      {/* Кнопка поиска */}
       <button
         onClick={() => setIsOpen(true)}
         className="flex items-center gap-2 px-3 py-2 bg-hover hover:bg-border rounded-lg transition-colors text-sm text-text"
@@ -81,7 +80,6 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
         <kbd className="text-xs bg-background border border-border rounded px-1.5 py-0.5 text-text-secondary">Ctrl+K</kbd>
       </button>
 
-      {/* Модальное окно */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -98,7 +96,6 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
               className="bg-background border border-border rounded-lg shadow-xl w-full max-w-2xl mx-4"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Поле поиска */}
               <div className="relative p-4 border-b border-border">
                 <Search className="w-5 h-5 absolute left-6 top-1/2 transform -translate-y-1/2 text-text-secondary" />
                 <input
@@ -117,7 +114,6 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
                 </button>
               </div>
 
-              {/* Результаты */}
               <div className="max-h-96 overflow-y-auto">
                 {query && results.length === 0 ? (
                   <div className="p-8 text-center text-text-secondary">

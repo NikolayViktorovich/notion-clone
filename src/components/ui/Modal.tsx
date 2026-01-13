@@ -53,7 +53,7 @@ export const Modal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.1 }}
+          transition={{ duration: 0.08 }}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={handleBackdropClick}
         >
@@ -61,7 +61,7 @@ export const Modal = ({
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            transition={{ duration: 0.1, ease: "easeOut" }}
             className="bg-background border border-border rounded-xl shadow-2xl w-full max-w-md mx-auto"
             role="dialog"
             aria-modal="true"

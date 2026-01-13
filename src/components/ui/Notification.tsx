@@ -26,7 +26,7 @@ export const Notification = ({
     setTimeout(() => {
       onClose();
       setIsClosing(false);
-    }, 150);
+    }, 100);
   }, [onClose]);
 
   useEffect(() => {
@@ -73,10 +73,10 @@ export const Notification = ({
     <AnimatePresence>
       {isVisible && !isClosing && (
         <motion.div
-          initial={{ opacity: 0, y: -30, scale: 0.95 }}
+          initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -30, scale: 0.95 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
+          exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          transition={{ duration: 0.1, ease: "easeOut" }}
           className={`fixed top-4 right-4 z-50 max-w-sm w-full ${getBackgroundColor()} border rounded-lg shadow-lg p-4`}
         >
           <div className="flex items-start gap-3">

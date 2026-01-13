@@ -64,7 +64,6 @@ export const InputModal = ({
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="bg-background border border-border rounded-xl shadow-lg max-w-md w-full p-6"
           >
-            {/* Хэдер */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-text">
                 {title}
@@ -77,14 +76,12 @@ export const InputModal = ({
               </button>
             </div>
 
-            {/* Описание */}
             {description && (
               <p className="text-text-secondary mb-4">
                 {description}
               </p>
             )}
 
-            {/* Ввод */}
             <input
               type="text"
               value={value}
@@ -94,8 +91,7 @@ export const InputModal = ({
               onKeyDown={handleKeyDown}
               autoFocus
             />
-
-            {/* ДЕйствия */}
+            
             <div className="flex gap-3 justify-end">
               <button
                 onClick={onClose}

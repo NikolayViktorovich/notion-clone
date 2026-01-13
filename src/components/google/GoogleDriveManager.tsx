@@ -119,8 +119,8 @@ export const GoogleDriveManager = () => {
       />
 
       <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-hover rounded-lg text-sm font-medium transition-colors border border-border hover:bg-border text-text"
       >
@@ -135,14 +135,16 @@ export const GoogleDriveManager = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.08 }}
               className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              initial={{ opacity: 0, scale: 0.95, y: -5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              exit={{ opacity: 0, scale: 0.95, y: -5 }}
+              transition={{ duration: 0.08 }}
               className="absolute right-0 top-12 z-50 w-80 bg-background border border-border rounded-lg shadow-xl p-4"
             >
               {!isAuthenticated ? (

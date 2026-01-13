@@ -613,7 +613,6 @@ console.log('Is today?', dayjs().isSame(now, 'day'));`
         className="mb-4 p-4 bg-hover border border-border rounded-lg max-w-full overflow-x-auto"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
-          {/* Шаблоны кода */}
           <div className="min-w-0">
             <h4 className="text-sm font-medium text-text mb-2">Шаблоны темплейтов</h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
