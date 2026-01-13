@@ -5,9 +5,8 @@ jest.mock('./store/useStore', () => ({
   useStore: () => ({
     currentPage: null,
     workspaces: [],
-    isLoading: false,
-    
-    initializeApp: jest.fn(),
+    sidebarOpen: true,
+    setSidebarOpen: jest.fn(),
     initializeOffline: jest.fn(),
     createPage: jest.fn(),
     updatePage: jest.fn(),
@@ -16,20 +15,41 @@ jest.mock('./store/useStore', () => ({
     updateBlock: jest.fn(),
     deleteBlock: jest.fn(),
     moveBlock: jest.fn(),
-    offlineStatus: {
-      isOnline: true,
-      lastSync: null,
-    },
+    searchContent: jest.fn().mockReturnValue([]),
+    getBlockComments: jest.fn().mockReturnValue([]),
+    addComment: jest.fn(),
+    resolveComment: jest.fn(),
+    deleteComment: jest.fn(),
+    createPageFromTemplate: jest.fn(),
+    offlineStatus: { isOnline: true, lastSync: null },
     forceSync: jest.fn(),
-    
-    theme: 'light',
+    templates: [],
+  }),
+}));
+
+jest.mock('./hooks/useTheme', () => ({
+  useTheme: () => ({
+    currentTheme: 'light',
+    themes: [{ id: 'light', name: 'Light', colors: { background: '#fff', text: '#000', border: '#ccc' } }],
     setTheme: jest.fn(),
+  }),
+  applyThemeToDocument: jest.fn(),
+}));
+
+jest.mock('./hooks/useWebClipper', () => ({
+  useWebClipper: () => ({
+    isClipperOpen: false,
+    currentClip: null,
+    isLoading: false,
+    openClipper: jest.fn(),
+    closeClipper: jest.fn(),
+    saveClip: jest.fn(),
+    importFromUrl: jest.fn(),
   }),
 }));
 
 test('renders app without crashing', () => {
   render(<App />);
-  
   expect(document.body).toBeInTheDocument();
 });
 
