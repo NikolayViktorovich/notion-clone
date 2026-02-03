@@ -201,7 +201,6 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
         const pageData = JSON.parse(content);
         textContent = formatPageAsText(pageData);
       } catch (e) {
-        console.log('Content is not JSON, using as plain text');
       }
 
       const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
@@ -429,11 +428,6 @@ function formatPageAsText(pageData: any): string {
         case 'todo':
           const todoStatus = block.content?.completed ? '[✓]' : '[ ]';
           text += `${todoStatus} ${block.content?.text || block.content}\n\n`;
-          break;
-        case 'code':
-          text += '```\n';
-          text += `${block.content}\n`;
-          text += '```\n\n';
           break;
         case 'quote':
           text += `> ${block.content}\n\n`;

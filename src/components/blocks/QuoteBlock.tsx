@@ -8,37 +8,32 @@ interface QuoteBlockProps {
   block: Block;
 }
 
-export const QuoteBlock = ({ block }: QuoteBlockProps) => {
-  const [content, setContent] = useState(block.content);
-  const [isEditing, setIsEditing] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { updateBlock } = useStore();
+export const QuoteBlock = ({ block: b }: QuoteBlockProps) => {
+  const [text, setText] = useState(b.content);
+  const [edit, setEdit] = useState(false);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const { updateBlock: update } = useStore();
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(
-        textareaRef.current.value.length,
-        textareaRef.current.value.length
-      );
+    if (edit && ref.current) {
+      ref.current.focus();
+      ref.current.setSelectionRange(ref.current.value.length, ref.current.value.length);
     }
-  }, [isEditing]);
+  }, [edit]);
 
-  const handleSave = () => {
-    if (content !== block.content) {
-      updateBlock(block.id, { content });
-    }
-    setIsEditing(false);
+  const save = () => {
+    if (text !== b.content) update(b.id, { content: text });
+    setEdit(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const keyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSave();
+      save();
     }
     if (e.key === 'Escape') {
-      setContent(block.content);
-      setIsEditing(false);
+      setText(b.content);
+      setEdit(false);
     }
   };
 
@@ -47,23 +42,24 @@ export const QuoteBlock = ({ block }: QuoteBlockProps) => {
       <div className="flex gap-4">
         <QuoteIcon className="w-6 h-6 text-text-secondary mt-1 flex-shrink-0" />
         
-        {isEditing ? (
+        {edit ? (
           <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            onBlur={handleSave}
-            onKeyDown={handleKeyDown}
+            ref={ref}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onBlur={save}
+            onKeyDown={keyDown}
             className="flex-1 resize-none border-none outline-none bg-transparent text-lg italic leading-relaxed text-text placeholder-text-secondary"
-            style={{ minHeight: '1.5em' }}
+            style={{ minHeight: '1.5em', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
             placeholder="Write a quote..."
           />
         ) : (
           <blockquote
-            onClick={() => setIsEditing(true)}
-            className="flex-1 cursor-text hover:bg-hover rounded px-3 py-2 -mx-3 text-lg italic leading-relaxed border-l-4 border-border pl-4 text-text"
+            onClick={() => setEdit(true)}
+            className="flex-1 cursor-text text-lg italic leading-relaxed border-l-4 border-border pl-4 text-text"
+            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
           >
-            {content || <span className="text-text-secondary">Empty quote...</span>}
+            {text || <span className="text-text-secondary">Empty quote...</span>}
           </blockquote>
         )}
       </div>

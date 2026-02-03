@@ -8,80 +8,70 @@ interface TodoBlockProps {
   block: Block;
 }
 
-export const TodoBlock = ({ block }: TodoBlockProps) => {
-  const [content, setContent] = useState(block.content);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { updateBlock } = useStore();
+export const TodoBlock = ({ block: b }: TodoBlockProps) => {
+  const [text, setText] = useState(b.content);
+  const [edit, setEdit] = useState(false);
+  const [done, setDone] = useState(false);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const { updateBlock: update } = useStore();
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(
-        textareaRef.current.value.length,
-        textareaRef.current.value.length
-      );
+    if (edit && ref.current) {
+      ref.current.focus();
+      ref.current.setSelectionRange(ref.current.value.length, ref.current.value.length);
     }
-  }, [isEditing]);
+  }, [edit]);
 
-  const handleSave = () => {
-    if (content !== block.content) {
-      updateBlock(block.id, { content });
-    }
-    setIsEditing(false);
+  const save = () => {
+    if (text !== b.content) update(b.id, { content: text });
+    setEdit(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const keyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSave();
+      save();
     }
     if (e.key === 'Escape') {
-      setContent(block.content);
-      setIsEditing(false);
+      setText(b.content);
+      setEdit(false);
     }
-  };
-
-  const toggleChecked = () => {
-    setIsChecked(!isChecked);
   };
 
   return (
     <BaseBlock>
       <div className="flex items-start gap-3">
         <button
-          onClick={toggleChecked}
+          onClick={() => setDone(!done)}
           className={`flex-shrink-0 w-5 h-5 mt-1 border-2 rounded flex items-center justify-center transition-colors ${
-            isChecked 
-              ? 'bg-accent border-accent text-white' 
-              : 'border-border hover:border-text text-transparent'
+            done ? 'bg-accent border-accent text-white' : 'border-border hover:border-text text-transparent'
           }`}
         >
-          {isChecked && <Check className="w-3 h-3" />}
+          {done && <Check className="w-3 h-3" />}
         </button>
 
-        {isEditing ? (
+        {edit ? (
           <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            onBlur={handleSave}
-            onKeyDown={handleKeyDown}
+            ref={ref}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onBlur={save}
+            onKeyDown={keyDown}
             className={`flex-1 resize-none border-none outline-none bg-transparent leading-relaxed text-text placeholder-text-secondary ${
-              isChecked ? 'line-through text-text-secondary' : ''
+              done ? 'line-through text-text-secondary' : ''
             }`}
-            style={{ minHeight: '1.5em' }}
+            style={{ minHeight: '1.5em', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
             placeholder="Todo item..."
           />
         ) : (
           <div
-            onClick={() => setIsEditing(true)}
-            className={`flex-1 cursor-text hover:bg-hover rounded px-2 py-1 -mx-2 leading-relaxed whitespace-pre-wrap min-h-[1.5em] ${
-              isChecked ? 'line-through text-text-secondary' : 'text-text'
+            onClick={() => setEdit(true)}
+            className={`flex-1 cursor-text leading-relaxed min-h-[1.5em] ${
+              done ? 'line-through text-text-secondary' : 'text-text'
             }`}
+            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}
           >
-            {content || <span className="text-text-secondary">Empty todo item...</span>}
+            {text || <span className="text-text-secondary">Empty todo item...</span>}
           </div>
         )}
       </div>

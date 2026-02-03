@@ -7,7 +7,7 @@ jest.mock('./store/useStore', () => ({
     workspaces: [],
     sidebarOpen: true,
     setSidebarOpen: jest.fn(),
-    initializeOffline: jest.fn(),
+    initializeOffline: jest.fn().mockResolvedValue(undefined),
     createPage: jest.fn(),
     updatePage: jest.fn(),
     deletePage: jest.fn(),
@@ -34,18 +34,6 @@ jest.mock('./hooks/useTheme', () => ({
     setTheme: jest.fn(),
   }),
   applyThemeToDocument: jest.fn(),
-}));
-
-jest.mock('./hooks/useWebClipper', () => ({
-  useWebClipper: () => ({
-    isClipperOpen: false,
-    currentClip: null,
-    isLoading: false,
-    openClipper: jest.fn(),
-    closeClipper: jest.fn(),
-    saveClip: jest.fn(),
-    importFromUrl: jest.fn(),
-  }),
 }));
 
 test('renders app without crashing', () => {

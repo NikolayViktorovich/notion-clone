@@ -1,5 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useCallback } from 'react';
 
 interface ModalProps {
@@ -49,52 +48,38 @@ export const Modal = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.08 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           onClick={handleBackdropClick}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.1, ease: "easeOut" }}
-            className="bg-background border border-border rounded-xl shadow-2xl w-full max-w-md mx-auto"
+          <div
+            className="bg-background border border-border rounded-lg w-full max-w-sm"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 id="modal-title" className="text-lg font-semibold text-text">
-                  {title}
-                </h3>
-                <button
-                  onClick={onClose}
-                  className="p-1 hover:bg-hover rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
-                  aria-label="Закрыть модальное окно"
-                >
-                  <X className="w-5 h-5 text-text-secondary" />
-                </button>
-              </div>
+            <div className="p-5">
+              <h3 id="modal-title" className="text-base font-medium text-text mb-3">
+                {title}
+              </h3>
+              
               {description && (
-                <p className="text-text-secondary mb-6 text-sm leading-relaxed">
+                <p className="text-sm text-text-secondary mb-5">
                   {description}
                 </p>
               )}
+              
               {children && (
-                <div className="mb-6">
+                <div className="mb-5">
                   {children}
                 </div>
               )}
-              <div className="flex gap-3 justify-end">
+              
+              <div className="flex gap-2 justify-end">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 text-sm font-medium text-text-secondary bg-transparent hover:bg-hover rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background min-w-20"
+                  className="px-3 py-1.5 text-sm text-text-secondary hover:text-text transition-colors"
                 >
                   {cancelText}
                 </button>
@@ -103,20 +88,20 @@ export const Modal = ({
                     onConfirm();
                     onClose();
                   }}
-                  className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background min-w-20 ${
+                  className={`px-3 py-1.5 text-sm rounded transition-colors ${
                     type === 'delete' 
-                      ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' 
+                      ? 'bg-red-600 hover:bg-red-700 text-white' 
                       : type === 'warning'
-                      ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
-                      : 'bg-accent hover:opacity-90 focus:ring-accent'
+                      ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                      : 'bg-accent hover:opacity-90 text-white'
                   }`}
                 >
                   {confirmText}
                 </button>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );

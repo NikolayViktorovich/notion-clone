@@ -7,59 +7,55 @@ interface TextBlockProps {
   block: Block;
 }
 
-export const TextBlock = ({ block }: TextBlockProps) => {
-  const [content, setContent] = useState(block.content);
-  const [isEditing, setIsEditing] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { updateBlock } = useStore();
+export const TextBlock = ({ block: b }: TextBlockProps) => {
+  const [text, setText] = useState(b.content);
+  const [edit, setEdit] = useState(false);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const { updateBlock: update } = useStore();
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(
-        textareaRef.current.value.length,
-        textareaRef.current.value.length
-      );
+    if (edit && ref.current) {
+      ref.current.focus();
+      ref.current.setSelectionRange(ref.current.value.length, ref.current.value.length);
     }
-  }, [isEditing]);
+  }, [edit]);
 
-  const handleSave = () => {
-    if (content !== block.content) {
-      updateBlock(block.id, { content });
-    }
-    setIsEditing(false);
+  const save = () => {
+    if (text !== b.content) update(b.id, { content: text });
+    setEdit(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const keyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSave();
+      save();
     }
     if (e.key === 'Escape') {
-      setContent(block.content);
-      setIsEditing(false);
+      setText(b.content);
+      setEdit(false);
     }
   };
 
   return (
     <BaseBlock>
-      {isEditing ? (
+      {edit ? (
         <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
+          ref={ref}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onBlur={save}
+          onKeyDown={keyDown}
           className="w-full resize-none border-none outline-none text-lg leading-relaxed bg-transparent text-text placeholder-text-secondary"
-          style={{ minHeight: '1.5em' }}
+          style={{ minHeight: '1.5em', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
           placeholder="Напишите что-нибудь..."
         />
       ) : (
         <div
-          onClick={() => setIsEditing(true)}
-          className="cursor-text hover:bg-hover rounded px-2 py-1 -mx-2 text-lg leading-relaxed whitespace-pre-wrap min-h-[1.5em] text-text"
+          onClick={() => setEdit(true)}
+          className="cursor-text text-lg leading-relaxed min-h-[1.5em] text-text"
+          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}
         >
-          {content || <span className="text-text-secondary">Пустой текстовый блок...</span>}
+          {text || <span className="text-text-secondary">Пустой текстовый блок...</span>}
         </div>
       )}
     </BaseBlock>

@@ -1,15 +1,35 @@
+import { DB_CONFIG, TIMEOUTS, STORAGE_KEYS } from '../constants';
+
+interface OfflineEntity {
+  id: string;
+  isSynced: boolean;
+  lastSynced?: Date;
+  version: number;
+}
+
+interface SyncQueueItem {
+  id?: number;
+  type: string;
+  action: string;
+  entityId: string;
+  data: any;
+  timestamp: Date;
+  retryCount: number;
+}
+
 class OfflineStorage {
-  private dbName = 'NotionOfflineDB';
-  private version = 1;
+  private dbName = DB_CONFIG.NAME;
+  private version = DB_CONFIG.VERSION;
   private db: IDBDatabase | null = null;
   private isOnline = navigator.onLine;
+  private initPromise: Promise<IDBDatabase> | null = null;
 
   constructor() {
-    this.init();
+    this.initPromise = this.init();
     this.setupEventListeners();
   }
 
-  private async init() {
+  private async init(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
 
@@ -22,25 +42,25 @@ class OfflineStorage {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         
-        if (!db.objectStoreNames.contains('workspaces')) {
-          const workspaceStore = db.createObjectStore('workspaces', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains(DB_CONFIG.STORES.WORKSPACES)) {
+          const workspaceStore = db.createObjectStore(DB_CONFIG.STORES.WORKSPACES, { keyPath: 'id' });
           workspaceStore.createIndex('isSynced', 'isSynced');
         }
         
-        if (!db.objectStoreNames.contains('pages')) {
-          const pageStore = db.createObjectStore('pages', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains(DB_CONFIG.STORES.PAGES)) {
+          const pageStore = db.createObjectStore(DB_CONFIG.STORES.PAGES, { keyPath: 'id' });
           pageStore.createIndex('workspaceId', 'workspaceId');
           pageStore.createIndex('isSynced', 'isSynced');
         }
         
-        if (!db.objectStoreNames.contains('blocks')) {
-          const blockStore = db.createObjectStore('blocks', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains(DB_CONFIG.STORES.BLOCKS)) {
+          const blockStore = db.createObjectStore(DB_CONFIG.STORES.BLOCKS, { keyPath: 'id' });
           blockStore.createIndex('pageId', 'pageId');
           blockStore.createIndex('isSynced', 'isSynced');
         }
         
-        if (!db.objectStoreNames.contains('syncQueue')) {
-          const queueStore = db.createObjectStore('syncQueue', { 
+        if (!db.objectStoreNames.contains(DB_CONFIG.STORES.SYNC_QUEUE)) {
+          const queueStore = db.createObjectStore(DB_CONFIG.STORES.SYNC_QUEUE, { 
             keyPath: 'id', 
             autoIncrement: true 
           });
@@ -51,10 +71,12 @@ class OfflineStorage {
     });
   }
 
-  private setupEventListeners() {
+  private setupEventListeners(): void {
     window.addEventListener('online', () => {
       this.isOnline = true;
-      this.sync();
+      this.sync().catch(error => {
+        console.error('Sync failed on reconnection:', error);
+      });
     });
 
     window.addEventListener('offline', () => {
@@ -62,28 +84,43 @@ class OfflineStorage {
     });
   }
 
-  private async getStore(storeName: string, mode: IDBTransactionMode = 'readonly') {
+  private async getStore(storeName: string, mode: IDBTransactionMode = 'readonly'): Promise<IDBObjectStore> {
     await this.waitForDB();
-    const transaction = this.db!.transaction(storeName, mode);
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
+    const transaction = this.db.transaction(storeName, mode);
     return transaction.objectStore(storeName);
   }
 
-  private waitForDB(): Promise<void> {
+  private async waitForDB(): Promise<void> {
+    if (this.db) {
+      return;
+    }
+    
+    if (this.initPromise) {
+      await this.initPromise;
+      return;
+    }
+
     return new Promise((resolve) => {
-      if (this.db) {
-        resolve();
-      } else {
-        setTimeout(() => this.waitForDB().then(resolve), 100);
-      }
+      const checkDB = () => {
+        if (this.db) {
+          resolve();
+        } else {
+          setTimeout(checkDB, TIMEOUTS.SYNC_RETRY_DELAY);
+        }
+      };
+      checkDB();
     });
   }
 
-  async saveWorkspaces(workspaces: any[]) {
+  async saveWorkspaces(workspaces: any[]): Promise<void> {
     try {
-      const store = await this.getStore('workspaces', 'readwrite');
+      const store = await this.getStore(DB_CONFIG.STORES.WORKSPACES, 'readwrite');
       
       for (const workspace of workspaces) {
-        const offlineWorkspace = {
+        const offlineWorkspace: OfflineEntity & typeof workspace = {
           ...workspace,
           isSynced: this.isOnline,
           lastSynced: this.isOnline ? new Date() : undefined,
@@ -102,12 +139,12 @@ class OfflineStorage {
     }
   }
 
-  async savePages(pages: any[]) {
+  async savePages(pages: any[]): Promise<void> {
     try {
-      const store = await this.getStore('pages', 'readwrite');
+      const store = await this.getStore(DB_CONFIG.STORES.PAGES, 'readwrite');
       
       for (const page of pages) {
-        const offlinePage = {
+        const offlinePage: OfflineEntity & typeof page = {
           ...page,
           isSynced: this.isOnline,
           lastSynced: this.isOnline ? new Date() : undefined,
@@ -126,12 +163,12 @@ class OfflineStorage {
     }
   }
 
-  async saveBlocks(blocks: any[]) {
+  async saveBlocks(blocks: any[]): Promise<void> {
     try {
-      const store = await this.getStore('blocks', 'readwrite');
+      const store = await this.getStore(DB_CONFIG.STORES.BLOCKS, 'readwrite');
       
       for (const block of blocks) {
-        const offlineBlock = {
+        const offlineBlock: OfflineEntity & typeof block = {
           ...block,
           isSynced: this.isOnline,
           lastSynced: this.isOnline ? new Date() : undefined,
@@ -150,12 +187,12 @@ class OfflineStorage {
     }
   }
 
-  private async addToSyncQueue(type: string, action: string, data: any[]) {
+  private async addToSyncQueue(type: string, action: string, data: any[]): Promise<void> {
     try {
-      const store = await this.getStore('syncQueue', 'readwrite');
+      const store = await this.getStore(DB_CONFIG.STORES.SYNC_QUEUE, 'readwrite');
       
       for (const item of data) {
-        const queueItem = {
+        const queueItem: SyncQueueItem = {
           type,
           action,
           entityId: item.id,
@@ -173,7 +210,7 @@ class OfflineStorage {
 
   async loadWorkspaces(): Promise<any[]> {
     try {
-      const store = await this.getStore('workspaces');
+      const store = await this.getStore(DB_CONFIG.STORES.WORKSPACES);
       return new Promise((resolve) => {
         const request = store.getAll();
         request.onsuccess = () => resolve(request.result || []);
@@ -186,7 +223,7 @@ class OfflineStorage {
 
   async loadPages(): Promise<any[]> {
     try {
-      const store = await this.getStore('pages');
+      const store = await this.getStore(DB_CONFIG.STORES.PAGES);
       return new Promise((resolve) => {
         const request = store.getAll();
         request.onsuccess = () => resolve(request.result || []);
@@ -199,7 +236,7 @@ class OfflineStorage {
 
   async loadBlocks(pageId?: string): Promise<any[]> {
     try {
-      const store = await this.getStore('blocks');
+      const store = await this.getStore(DB_CONFIG.STORES.BLOCKS);
       return new Promise((resolve) => {
         const request = pageId 
           ? store.index('pageId').getAll(pageId)
@@ -213,10 +250,10 @@ class OfflineStorage {
     }
   }
 
-  private saveToLocalStorage(key: string, data: any) {
+  private saveToLocalStorage(key: string, data: any): void {
     try {
-      localStorage.setItem(`notion_${key}`, JSON.stringify(data));
-      localStorage.setItem(`notion_${key}_timestamp`, new Date().toISOString());
+      localStorage.setItem(`${STORAGE_KEYS.NOTION_PREFIX}${key}`, JSON.stringify(data));
+      localStorage.setItem(`${STORAGE_KEYS.NOTION_PREFIX}${key}_timestamp`, new Date().toISOString());
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
@@ -224,7 +261,7 @@ class OfflineStorage {
 
   private loadFromLocalStorage(key: string): any {
     try {
-      const data = localStorage.getItem(`notion_${key}`);
+      const data = localStorage.getItem(`${STORAGE_KEYS.NOTION_PREFIX}${key}`);
       return data ? JSON.parse(data) : null;
     } catch (error) {
       console.error('Error loading from localStorage:', error);
@@ -232,12 +269,12 @@ class OfflineStorage {
     }
   }
 
-  async sync() {
+  async sync(): Promise<void> {
     if (!this.isOnline) return;
 
     try {
-      const queueStore = await this.getStore('syncQueue');
-      const items = await new Promise<any[]>((resolve) => {
+      const queueStore = await this.getStore(DB_CONFIG.STORES.SYNC_QUEUE);
+      const items = await new Promise<SyncQueueItem[]>((resolve) => {
         const request = queueStore.getAll();
         request.onsuccess = () => resolve(request.result || []);
         request.onerror = () => resolve([]);
@@ -245,13 +282,11 @@ class OfflineStorage {
 
       if (items.length === 0) return;
 
-      console.log('Syncing', items.length, 'items...');
-
       for (const item of items) {
         await this.syncItem(item);
       }
 
-      const clearStore = await this.getStore('syncQueue', 'readwrite');
+      const clearStore = await this.getStore(DB_CONFIG.STORES.SYNC_QUEUE, 'readwrite');
       clearStore.clear();
 
     } catch (error) {
@@ -259,23 +294,22 @@ class OfflineStorage {
     }
   }
 
-  private async syncItem(item: any) {
+  private async syncItem(item: SyncQueueItem): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        console.log('Synced item:', item);
-        resolve(true);
-      }, 100);
+        resolve();
+      }, TIMEOUTS.SYNC_RETRY_DELAY);
     });
   }
 
-  getStatus() {
+  getStatus(): { isOnline: boolean; hasData: boolean } {
     return {
       isOnline: this.isOnline,
       hasData: this.db !== null
     };
   }
 
-  async forceSync() {
+  async forceSync(): Promise<void> {
     await this.sync();
   }
 }

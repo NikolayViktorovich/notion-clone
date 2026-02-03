@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Moon, Sun, Check } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -22,20 +22,12 @@ export const ThemeToggle = () => {
       <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.08 }}
+            <div
               className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
             
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -5 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -5 }}
-              transition={{ duration: 0.08 }}
+            <div
               className="absolute right-0 top-12 z-50 w-48 bg-background border border-border rounded-lg shadow-xl overflow-hidden"
             >
               {themes.map((theme) => (
@@ -61,7 +53,7 @@ export const ThemeToggle = () => {
                   <span className="font-medium">{theme.name}</span>
                 </button>
               ))}
-            </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>

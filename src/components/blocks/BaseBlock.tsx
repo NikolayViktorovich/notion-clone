@@ -11,7 +11,7 @@ export const BaseBlock = ({ children, className = '', isDragging = false }: Base
     <div
       className={`
         group relative border border-border rounded-lg p-2 sm:p-3 lg:p-4 bg-background 
-        hover:bg-hover transition-all
+        hover:bg-hover transition-all overflow-hidden
         ${isDragging ? 'shadow-lg opacity-50' : 'shadow-sm'}
         ${className}
       `}

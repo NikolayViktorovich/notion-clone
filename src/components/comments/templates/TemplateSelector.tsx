@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutTemplate, X, Search } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useStore } from '../../../store/useStore';
 import { PageTemplate } from '../../../types';
 
@@ -16,11 +16,11 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories = [
-    { id: 'all', name: 'Все', count: templates.length },
-    { id: 'personal', name: 'Личное', count: templates.filter(t => t.category === 'personal').length },
-    { id: 'work', name: 'Работа', count: templates.filter(t => t.category === 'work').length },
-    { id: 'project', name: 'Проекты', count: templates.filter(t => t.category === 'project').length },
-    { id: 'education', name: 'Обучение', count: templates.filter(t => t.category === 'education').length },
+    { id: 'all', name: 'Все' },
+    { id: 'personal', name: 'Личное' },
+    { id: 'work', name: 'Работа' },
+    { id: 'project', name: 'Проекты' },
+    { id: 'education', name: 'Обучение' },
   ];
 
   const filteredTemplates = templates.filter(template => {
@@ -40,117 +40,84 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.08 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-0 lg:p-4 bg-black/50 backdrop-blur-sm"
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
           onClick={onClose}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.1, ease: "easeOut" }}
-            className="bg-sidebar w-full h-full lg:w-full lg:max-w-6xl lg:h-auto lg:max-h-[90vh] flex flex-col lg:rounded-xl shadow-2xl border border-border"
+          <div
+            className="bg-background w-full max-w-2xl max-h-[80vh] flex flex-col rounded-lg border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 lg:p-6 border-b border-border safe-area-inset-top">
-              <div className="flex items-center gap-3">
-                <LayoutTemplate className="w-6 h-6 text-text" />
-                <div>
-                  <h2 className="text-xl font-semibold text-text">Выберите шаблон</h2>
-                  <p className="text-sm text-text-secondary hidden lg:block">Начните с готовой структуры</p>
-                </div>
-              </div>
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-base font-medium text-text">Шаблоны</h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-hover rounded-lg transition-colors text-text-secondary hover:text-text"
+                className="p-1 hover:bg-hover rounded transition-colors text-text-secondary"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 lg:p-6 border-b border-border">
-              <div className="relative mb-4">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary" />
-                <input
-                  type="text"
-                  placeholder="Поиск шаблонов..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-text placeholder-text-secondary"
-                />
-              </div>
+            <div className="p-4 border-b border-border space-y-3">
+              <input
+                type="text"
+                placeholder="Поиск..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-background border border-border rounded outline-none text-text placeholder-text-secondary"
+              />
               
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-2 overflow-x-auto">
                 {categories.map((category) => (
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                    className={`px-3 py-1.5 text-sm rounded whitespace-nowrap transition-colors ${
                       selectedCategory === category.id
-                        ? 'bg-accent shadow-sm special-theme-button'
-                        : 'bg-hover text-text hover:bg-hover-secondary'
+                        ? 'bg-background text-text border border-border'
+                        : 'bg-hover text-text hover:bg-border'
                     }`}
                   >
                     {category.name}
-                    <span className={`px-1.5 py-0.5 rounded text-xs ${
-                      selectedCategory === category.id
-                        ? 'opacity-70'
-                        : 'bg-background text-text-secondary'
-                    }`}>
-                      {category.count}
-                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6 safe-area-inset-bottom">
+            <div className="flex-1 overflow-y-auto p-4">
               {filteredTemplates.length === 0 ? (
-                <div className="text-center py-12 text-text-secondary">
-                  <LayoutTemplate className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Шаблоны не найдены</p>
-                  <p className="text-sm mt-1">Попробуйте изменить поисковый запрос или категорию</p>
+                <div className="text-center py-12 text-text-secondary text-sm">
+                  Шаблоны не найдены
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {filteredTemplates.map((template) => (
-                    <motion.button
+                    <button
                       key={template.id}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
                       onClick={() => handleTemplateSelect(template)}
-                      className="text-left p-4 border border-border rounded-lg hover:border-text hover:shadow-md transition-fast group bg-background text-text"
+                      className="text-left p-3 border border-border rounded hover:border-accent transition-colors bg-background"
                     >
-                      <div className="flex items-start gap-3 mb-3">
-                        <span className="text-2xl flex-shrink-0">{template.icon}</span>
+                      <div className="flex items-start gap-2 mb-2">
+                        <span className="text-xl">{template.icon}</span>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-text transition-colors truncate">
+                          <h3 className="text-sm font-medium text-text truncate">
                             {template.name}
                           </h3>
-                          <p className="text-sm text-text-secondary mt-1 line-clamp-2">
+                          <p className="text-xs text-text-secondary mt-1 line-clamp-2">
                             {template.description}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-text-secondary capitalize">
-                          {template.category}
-                        </span>
-                        <span className="text-xs text-text-secondary">
-                          {template.blocks.length} блоков
-                        </span>
+                      <div className="text-xs text-text-secondary">
+                        {template.blocks.length} блоков
                       </div>
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );

@@ -8,11 +8,11 @@ interface HeaderBlockProps {
   level: 1 | 2 | 3;
 }
 
-export const HeaderBlock = ({ block, level }: HeaderBlockProps) => {
-  const [content, setContent] = useState(block.content);
-  const [isEditing, setIsEditing] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { updateBlock } = useStore();
+export const HeaderBlock = ({ block: b, level: lvl }: HeaderBlockProps) => {
+  const [text, setText] = useState(b.content);
+  const [edit, setEdit] = useState(false);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const { updateBlock: update } = useStore();
 
   const sizes = {
     1: 'text-3xl font-bold',
@@ -21,40 +21,36 @@ export const HeaderBlock = ({ block, level }: HeaderBlockProps) => {
   };
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(
-        textareaRef.current.value.length,
-        textareaRef.current.value.length
-      );
+    if (edit && ref.current) {
+      ref.current.focus();
+      ref.current.setSelectionRange(ref.current.value.length, ref.current.value.length);
     }
-  }, [isEditing]);
+  }, [edit]);
 
-  const handleSave = () => {
-    if (content !== block.content) {
-      updateBlock(block.id, { content });
-    }
-    setIsEditing(false);
+  const save = () => {
+    if (text !== b.content) update(b.id, { content: text });
+    setEdit(false);
   };
 
   return (
     <BaseBlock>
-      {isEditing ? (
+      {edit ? (
         <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onBlur={handleSave}
-          className={`w-full resize-none border-none outline-none bg-transparent text-text ${sizes[level]}`}
-          style={{ minHeight: '1.5em' }}
+          ref={ref}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onBlur={save}
+          className={`w-full resize-none border-none outline-none bg-transparent text-text ${sizes[lvl]}`}
+          style={{ minHeight: '1.5em', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
           placeholder="Введите заголовок..."
         />
       ) : (
         <div
-          onClick={() => setIsEditing(true)}
-          className={`cursor-text hover:bg-hover rounded px-2 py-1 -mx-2 text-text ${sizes[level]}`}
+          onClick={() => setEdit(true)}
+          className={`cursor-text text-text ${sizes[lvl]}`}
+          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
         >
-          {content || <span className="text-text-secondary">Пустой заголовок...</span>}
+          {text || <span className="text-text-secondary">Пустой заголовок...</span>}
         </div>
       )}
     </BaseBlock>

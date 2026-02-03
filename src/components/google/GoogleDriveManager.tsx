@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Cloud, Upload, Download, LogOut, User, FileText, Trash2, ExternalLink } from 'lucide-react';
 import { useGoogleDrive } from '../../hooks/useGoogleDrive';
 import { useStore } from '../../store/useStore';
@@ -58,9 +58,8 @@ export const GoogleDriveManager = () => {
   const handleLoadFromDrive = async (fileId: string) => {
     try {
       const content = await loadFromDrive(fileId);
-      const pageData = JSON.parse(content);
+      JSON.parse(content); // Validate JSON format
       
-      console.log('Loaded page data:', pageData);
       notifySuccess('Страница загружена из Google Drive!');
       
     } catch (error) {
@@ -118,33 +117,23 @@ export const GoogleDriveManager = () => {
         duration={5000}
       />
 
-      <motion.button
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-hover rounded-lg text-sm font-medium transition-colors border border-border hover:bg-border text-text"
       >
         <Cloud className="w-4 h-4" />
         Google Drive
-      </motion.button>
+      </button>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.08 }}
+            <div
               className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
             
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -5 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -5 }}
-              transition={{ duration: 0.08 }}
+            <div
               className="absolute right-0 top-12 z-50 w-80 bg-background border border-border rounded-lg shadow-xl p-4"
             >
               {!isAuthenticated ? (
@@ -276,7 +265,7 @@ export const GoogleDriveManager = () => {
                   )}
                 </div>
               )}
-            </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>

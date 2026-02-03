@@ -1,28 +1,77 @@
 # Notion Clone
 
-Полнофункциональный клон Notion с реальным временем и блочным редактором. Реалтайм-синхронизация с использованием React и WebRTC.
+Современный блочный редактор с поддержкой drag & drop, тем оформления и Google Drive интеграции.
 
-![Скриншот](https://i.postimg.cc/fyb1LMY5/notionclone.png)
+![Notion Clone](https://i.postimg.cc/fyb1LMY5/notionclone.png)
 
-## Live Demo
-[Посмотреть Демо](https://notion-clone-chi-seven.vercel.app/)
+**[Live Demo](https://notion-clone-chi-seven.vercel.app/)**
 
-## Возможности
-- **Блочный редактор** - текст, заголовки, списки, код
-- **Google-авторизация/синхронизация с облаком**
-- **Темная/светлая темы** с сохранением предпочтений
-- **Поиск документов** по содержимому
-- **Аутентификация пользователей** через QAuth
+---
+
+## Основной функционал
+
+- **Блочный редактор** - текст, заголовки, todo-списки, цитаты
+- **Drag & Drop** - перестановка блоков
+- **Google Drive** - сохранение и загрузка страниц
+- **Offline-first** - работа без интернета (IndexedDB)
+- **4 темы** - светлая, темная, синяя светлая, синяя темная
+- **Поиск** - по всем страницам и блокам
+- **Undo/Redo** - отмена и повтор действий
+- **Адаптивный дизайн** - mobile, tablet, desktop
+
+---
 
 ## Технологии
-- **Frontend**: Next.js 14, React, TypeScript, Zustand, Tailwind CSS
-- **Backend & DB**: Convex, REST API, WebRTC
-- **Аутентификация**: QAuth
-- **Файлы**: Convex File Storage
-- **Деплой**: Vercel
 
-## Установка и Запуск
+**Frontend:** React 19, TypeScript, Zustand, Tailwind CSS, Framer Motion  
+**Библиотеки:** @dnd-kit, lucide-react, react-router-dom  
+**API:** Google Drive API, IndexedDB  
+**Сборка:** React Scripts, Jest
 
-1. Клонируйте репозиторий:
+---
+
+## Быстрый старт
+
 ```bash
 git clone https://github.com/NikolayViktorovich/notion-clone.git
+cd notion-clone
+npm install
+npm start
+```
+
+Откроется на `http://localhost:3000`
+
+---
+
+## Google Drive (опционально)
+
+Создайте OAuth credentials в [Google Cloud Console](https://console.cloud.google.com/) и добавьте в `.env`:
+
+```env
+REACT_APP_GOOGLE_CLIENT_ID=your_client_id
+REACT_APP_GOOGLE_API_KEY=your_api_key
+```
+
+---
+
+## Что реализовано
+
+✅ Блочный редактор с 4 типами блоков  
+✅ Drag & Drop для перестановки  
+✅ Google OAuth 2.0 + Drive API  
+✅ Offline-first с IndexedDB  
+✅ Undo/Redo функциональность  
+✅ Поиск по контенту  
+✅ Шаблоны страниц  
+✅ Экспорт в JSON  
+✅ 4 темы оформления  
+✅ Адаптивный дизайн  
+
+---
+
+## Production Build
+
+```bash
+npm run build
+# Bundle size (gzipped): ~109 KB JS + ~6 KB CSS
+```

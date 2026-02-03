@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, CheckCircle, Trash2 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Comment } from '../../types';
@@ -27,7 +27,7 @@ export const CommentSystem = ({ blockId }: CommentSystemProps) => {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div initial={{ opacity: 0, x: 5, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 5, scale: 0.95 }} transition={{ duration: 0.08 }} className="absolute right-0 top-8 z-50 w-80 bg-background border border-border rounded-lg shadow-xl">
+          <div className="absolute right-0 top-8 z-50 w-80 bg-background border border-border rounded-lg shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="font-semibold text-text">Комментарии</h3>
               <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-hover rounded text-text-secondary"><X className="w-4 h-4" /></button>
@@ -49,7 +49,7 @@ export const CommentSystem = ({ blockId }: CommentSystemProps) => {
                 <button onClick={handleAddComment} disabled={!newComment.trim()} className="px-4 py-2 bg-accent text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors special-theme-button">Добавить</button>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
