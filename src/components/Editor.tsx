@@ -1,4 +1,3 @@
-import { AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { TextBlock } from './blocks/TextBlock';
 import { HeaderBlock } from './blocks/HeaderBlock';
