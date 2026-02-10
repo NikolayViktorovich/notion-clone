@@ -66,7 +66,7 @@ export const CommentItem = ({ comment, onResolve, onDelete }: { comment: Comment
         </div>
         <div className="flex items-center gap-1">
           <button onClick={onResolve} className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors" title="Пометить решенным"><CheckCircle className="w-4 h-4" /></button>
-          <button onClick={onDelete} className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors" title="Удалить комментарий"><Trash2 className="w-4 h-4" /></button>
+          <button onClick={onDelete} className="p-1 text-text-secondary hover:bg-hover rounded transition-colors" title="Удалить комментарий"><Trash2 className="w-4 h-4" /></button>
         </div>
       </div>
       <p className="text-sm text-gray-700">{comment.content}</p>

@@ -1,4 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
+import { useI18n } from '../../hooks/useI18n';
 
 interface InputModalProps {
   isOpen: boolean;
@@ -19,12 +20,14 @@ export const InputModal = ({
   onConfirm,
   title,
   description,
-  confirmText = 'Сохранить',
-  cancelText = 'Отмена',
-  placeholder = 'Введите значение',
+  confirmText,
+  cancelText,
+  placeholder,
   value,
   onChange
 }: InputModalProps) => {
+  const { t } = useI18n();
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -73,7 +76,7 @@ export const InputModal = ({
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
+                placeholder={placeholder || t('modal.placeholder')}
                 className="w-full px-3 py-2 text-sm bg-background border border-border rounded text-text placeholder-text-secondary focus:outline-none focus:border-accent mb-4"
                 onKeyDown={handleKeyDown}
                 autoFocus
@@ -84,14 +87,14 @@ export const InputModal = ({
                   onClick={onClose}
                   className="px-3 py-1.5 text-sm text-text-secondary hover:text-text transition-colors"
                 >
-                  {cancelText}
+                  {cancelText || t('modal.cancel')}
                 </button>
                 <button
                   onClick={handleConfirm}
                   disabled={!value.trim()}
                   className="px-3 py-1.5 text-sm bg-accent hover:opacity-90 text-white rounded transition-colors disabled:opacity-50"
                 >
-                  {confirmText}
+                  {confirmText || t('modal.save')}
                 </button>
               </div>
             </div>

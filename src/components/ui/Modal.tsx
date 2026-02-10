@@ -1,5 +1,6 @@
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect, useCallback } from 'react';
+import { useI18n } from '../../hooks/useI18n';
 
 interface ModalProps {
   isOpen: boolean;
@@ -19,11 +20,13 @@ export const Modal = ({
   onConfirm,
   title,
   description,
-  confirmText = 'Удалить',
-  cancelText = 'Отмена',
+  confirmText,
+  cancelText,
   type = 'delete',
   children
 }: ModalProps) => {
+  const { t } = useI18n();
+  
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   }, [onClose]);
@@ -81,7 +84,7 @@ export const Modal = ({
                   onClick={onClose}
                   className="px-3 py-1.5 text-sm text-text-secondary hover:text-text transition-colors"
                 >
-                  {cancelText}
+                  {cancelText || t('common.cancel')}
                 </button>
                 <button
                   onClick={() => {
@@ -96,7 +99,7 @@ export const Modal = ({
                       : 'bg-accent hover:opacity-90 text-white'
                   }`}
                 >
-                  {confirmText}
+                  {confirmText || t('common.delete')}
                 </button>
               </div>
             </div>

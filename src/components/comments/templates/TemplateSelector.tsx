@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useStore } from '../../../store/useStore';
 import { PageTemplate } from '../../../types';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface TemplateSelectorProps {
   isOpen: boolean;
@@ -11,16 +12,17 @@ interface TemplateSelectorProps {
 }
 
 export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: TemplateSelectorProps) => {
+  const { t } = useI18n();
   const { templates } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories = [
-    { id: 'all', name: 'Все' },
-    { id: 'personal', name: 'Личное' },
-    { id: 'work', name: 'Работа' },
-    { id: 'project', name: 'Проекты' },
-    { id: 'education', name: 'Обучение' },
+    { id: 'all', name: t('templateCategories.all') },
+    { id: 'personal', name: t('templateCategories.personal') },
+    { id: 'work', name: t('templateCategories.work') },
+    { id: 'planning', name: t('templateCategories.planning') },
+    { id: 'notes', name: t('templateCategories.notes') },
   ];
 
   const filteredTemplates = templates.filter(template => {
@@ -49,7 +51,7 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-base font-medium text-text">Шаблоны</h2>
+              <h2 className="text-base font-medium text-text">{t('sidebar.templates')}</h2>
               <button
                 onClick={onClose}
                 className="p-1 hover:bg-hover rounded transition-colors text-text-secondary"
@@ -61,7 +63,7 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
             <div className="p-4 border-b border-border space-y-3">
               <input
                 type="text"
-                placeholder="Поиск..."
+                placeholder={`${t('common.search')}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 text-sm bg-background border border-border rounded outline-none text-text placeholder-text-secondary"
@@ -87,7 +89,7 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
             <div className="flex-1 overflow-y-auto p-4">
               {filteredTemplates.length === 0 ? (
                 <div className="text-center py-12 text-text-secondary text-sm">
-                  Шаблоны не найдены
+                  {t('googleDrive.noFiles')}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -109,7 +111,7 @@ export const TemplateSelector = ({ isOpen, onClose, onTemplateSelect }: Template
                         </div>
                       </div>
                       <div className="text-xs text-text-secondary">
-                        {template.blocks.length} блоков
+                        {template.blocks.length} {t('blocks.text')}
                       </div>
                     </button>
                   ))}

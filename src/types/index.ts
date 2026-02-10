@@ -2,7 +2,7 @@ export type BlockType = 'text' | 'heading' | 'todo' | 'quote';
 
 export interface Block {
   id: string;
-  type: string;
+  type: BlockType;
   content: string;
   children: Block[];
   createdAt: Date;
@@ -28,7 +28,7 @@ export interface Workspace {
 }
 
 export interface NewBlock {
-  type: string;
+  type: BlockType;
   content: string;
   children?: Block[];
 }

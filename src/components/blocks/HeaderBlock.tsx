@@ -1,58 +1,55 @@
-import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Block } from '../../types';
-import { BaseBlock } from './BaseBlock';
+import { useBlockEditor } from '../../hooks/useBlockEditor';
+import { createElement } from 'react';
+import { useI18n } from '../../hooks/useI18n';
 
 interface HeaderBlockProps {
   block: Block;
-  level: 1 | 2 | 3;
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
-export const HeaderBlock = ({ block: b, level: lvl }: HeaderBlockProps) => {
-  const [text, setText] = useState(b.content);
-  const [edit, setEdit] = useState(false);
-  const ref = useRef<HTMLTextAreaElement>(null);
-  const { updateBlock: update } = useStore();
+export const HeaderBlock = ({ block, level = 1 }: HeaderBlockProps) => {
+  const { t } = useI18n();
+  const { updateBlock } = useStore();
+  const { text, isEditing, ref, setText, setIsEditing, save, handleKeyDown } = useBlockEditor(
+    block,
+    (content) => updateBlock(block.id, { content })
+  );
 
-  const sizes = {
-    1: 'text-3xl font-bold',
-    2: 'text-2xl font-semibold',
-    3: 'text-xl font-medium',
-  };
-
-  useEffect(() => {
-    if (edit && ref.current) {
-      ref.current.focus();
-      ref.current.setSelectionRange(ref.current.value.length, ref.current.value.length);
-    }
-  }, [edit]);
-
-  const save = () => {
-    if (text !== b.content) update(b.id, { content: text });
-    setEdit(false);
+  const sizeClasses = {
+    1: 'text-3xl',
+    2: 'text-2xl',
+    3: 'text-xl',
+    4: 'text-lg',
+    5: 'text-base',
+    6: 'text-sm',
   };
 
   return (
-    <BaseBlock>
-      {edit ? (
+    <div className="notion-block">
+      {isEditing ? (
         <textarea
           ref={ref}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onBlur={save}
-          className={`w-full resize-none border-none outline-none bg-transparent text-text ${sizes[lvl]}`}
-          style={{ minHeight: '1.5em', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
-          placeholder="Введите заголовок..."
+          onKeyDown={handleKeyDown}
+          className={`w-full resize-none border-none outline-none font-bold leading-tight bg-transparent text-text placeholder-text-secondary px-2 py-1 ${sizeClasses[level]}`}
+          style={{ minHeight: '1.5em', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
+          placeholder={t('blocks.heading')}
         />
       ) : (
-        <div
-          onClick={() => setEdit(true)}
-          className={`cursor-text text-text ${sizes[lvl]}`}
-          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
-        >
-          {text || <span className="text-text-secondary">Пустой заголовок...</span>}
-        </div>
+        createElement(
+          `h${level}`,
+          {
+            onClick: () => setIsEditing(true),
+            className: `cursor-text font-bold leading-tight min-h-[1.5em] text-text px-2 py-1 ${sizeClasses[level]}`,
+            style: { wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }
+          },
+          text || createElement('span', { className: 'text-text-secondary' }, t('blocks.emptyHeading'))
+        )
       )}
-    </BaseBlock>
+    </div>
   );
 };

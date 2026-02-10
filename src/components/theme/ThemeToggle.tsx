@@ -2,19 +2,31 @@ import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Moon, Sun, Check } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
+import { useI18n } from '../../hooks/useI18n';
 
 export const ThemeToggle = () => {
   const { currentTheme, themes, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useI18n();
 
   const isDark = currentTheme === 'dark' || currentTheme === 'blue-dark';
+
+  const getThemeName = (themeId: string) => {
+    const themeMap: Record<string, string> = {
+      'light': t('theme.light'),
+      'dark': t('theme.dark'),
+      'blue-light': t('theme.blueLight'),
+      'blue-dark': t('theme.blueDark'),
+    };
+    return themeMap[themeId] || themeId;
+  };
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg transition-fast text-text hover:bg-hover border border-border"
-        aria-label="Сменить тему"
+        aria-label={t('theme.changeTheme')}
       >
         {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
       </button>
@@ -50,7 +62,7 @@ export const ThemeToggle = () => {
                       <Check className="w-3 h-3" style={{ color: theme.colors.text }} />
                     )}
                   </div>
-                  <span className="font-medium">{theme.name}</span>
+                  <span className="font-medium">{getThemeName(theme.id)}</span>
                 </button>
               ))}
             </div>

@@ -33,7 +33,11 @@ class OfflineStorage {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
 
-      request.onerror = () => reject(request.error);
+      request.onerror = () => {
+        console.error('IndexedDB init error:', request.error);
+        reject(request.error);
+      };
+      
       request.onsuccess = () => {
         this.db = request.result;
         resolve(this.db);
@@ -94,13 +98,18 @@ class OfflineStorage {
   }
 
   private async waitForDB(): Promise<void> {
-    if (this.db) {
-      return;
-    }
+    if (this.db) return;
     
     if (this.initPromise) {
-      await this.initPromise;
-      return;
+      try {
+        await this.initPromise;
+        return;
+      } catch (error) {
+        console.error('DB init failed, retrying:', error);
+        this.initPromise = this.init();
+        await this.initPromise;
+        return;
+      }
     }
 
     return new Promise((resolve) => {
@@ -123,7 +132,7 @@ class OfflineStorage {
         const offlineWorkspace: OfflineEntity & typeof workspace = {
           ...workspace,
           isSynced: this.isOnline,
-          lastSynced: this.isOnline ? new Date() : undefined,
+          lastSynced: this.isOnline ? new Date().toISOString() : undefined,
           version: 1
         };
         
@@ -147,7 +156,7 @@ class OfflineStorage {
         const offlinePage: OfflineEntity & typeof page = {
           ...page,
           isSynced: this.isOnline,
-          lastSynced: this.isOnline ? new Date() : undefined,
+          lastSynced: this.isOnline ? new Date().toISOString() : undefined,
           version: 1
         };
         
@@ -171,7 +180,7 @@ class OfflineStorage {
         const offlineBlock: OfflineEntity & typeof block = {
           ...block,
           isSynced: this.isOnline,
-          lastSynced: this.isOnline ? new Date() : undefined,
+          lastSynced: this.isOnline ? new Date().toISOString() : undefined,
           version: 1
         };
         
@@ -295,11 +304,13 @@ class OfflineStorage {
   }
 
   private async syncItem(item: SyncQueueItem): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, TIMEOUTS.SYNC_RETRY_DELAY);
-    });
+    try {
+      console.log(`Syncing ${item.type} ${item.action}:`, item.entityId);
+      await new Promise(resolve => setTimeout(resolve, TIMEOUTS.SYNC_RETRY_DELAY));
+    } catch (error) {
+      console.error('Sync item error:', error);
+      throw error;
+    }
   }
 
   getStatus(): { isOnline: boolean; hasData: boolean } {

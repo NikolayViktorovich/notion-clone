@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useStore } from '../../store/useStore';
 import { Wifi, WifiOff, RefreshCw, Check } from 'lucide-react';
+import { useI18n } from '../../hooks/useI18n';
 
 export const OfflineStatus = () => {
   const { offlineStatus, forceSync } = useStore();
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { t } = useI18n();
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -17,7 +19,7 @@ export const OfflineStatus = () => {
 
   if (offlineStatus.isOnline) {
     return (
-      <div className="p-1.5 text-text" title="Online">
+      <div className="p-1.5 text-text" title={t('offline.online')}>
         <Wifi className="w-4 h-4" />
       </div>
     );
@@ -25,7 +27,7 @@ export const OfflineStatus = () => {
 
   return (
     <div className="flex items-center gap-1.5">
-      <div className="p-1.5 text-text" title="Offline">
+      <div className="p-1.5 text-text" title={t('offline.offline')}>
         <WifiOff className="w-4 h-4" />
       </div>
 
@@ -42,7 +44,7 @@ export const OfflineStatus = () => {
             : 'special-theme-button hover:scale-105 active:scale-95'
           }
         `}
-        title={isSuccess ? "Синхронизировано" : isSyncing ? "Синхронизация..." : "Синхронизировать"}
+        title={isSuccess ? t('offline.synced') : isSyncing ? t('offline.syncing') : t('offline.sync')}
       >
         {isSuccess ? (
           <Check className="w-4 h-4" />

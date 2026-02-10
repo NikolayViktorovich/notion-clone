@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Search, FileText, ArrowRight, X } from 'lucide-react';
 import { useStore } from '../../../store/useStore';
+import { useI18n } from '../../../hooks/useI18n';
 
 interface EnhancedSearchProps {
   onSelect?: () => void;
@@ -17,6 +18,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const { searchContent, setCurrentPage } = useStore();
+  const { t } = useI18n();
 
   const results = useMemo(() => {
     return searchContent(query);
@@ -76,7 +78,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
         className="flex items-center gap-2 px-3 py-2 bg-hover hover:bg-border rounded-lg transition-colors text-sm text-text"
       >
         <Search className="w-4 h-4" />
-        <span>Поиск...</span>
+        <span>{t('search.search')}</span>
         <kbd className="text-xs bg-background border border-border rounded px-1.5 py-0.5 text-text-secondary">Ctrl+K</kbd>
       </button>
 
@@ -96,7 +98,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Поиск по всем страницам и блокам..."
+                  placeholder={t('search.searchPlaceholder')}
                   className="w-full pl-12 pr-10 py-3 border-0 outline-none text-lg placeholder-text-secondary bg-background text-text"
                   autoFocus
                 />
@@ -112,13 +114,13 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
                 {query && results.length === 0 ? (
                   <div className="p-8 text-center text-text-secondary">
                     <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>Ничего не найдено</p>
-                    <p className="text-sm mt-1">Попробуйте изменить запрос</p>
+                    <p>{t('search.noResults')}</p>
+                    <p className="text-sm mt-1">{t('search.tryAgain')}</p>
                   </div>
                 ) : results.length > 0 ? (
                   <div className="p-2">
                     <div className="px-3 py-2 text-xs font-medium text-text-secondary">
-                      Найдено {results.length} результатов
+                      {t('common.search')} {results.length}
                     </div>
                     {results.map((result, index) => (
                       <div
@@ -135,7 +137,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
                             {highlightText(result.content, result.matches)}
                           </p>
                           <p className="text-xs text-text-secondary mt-1 capitalize">
-                            {result.blockType} блок
+                            {result.blockType} {t('search.blockType')}
                           </p>
                         </div>
                         <ArrowRight className="w-4 h-4 text-text-secondary group-hover:text-accent transition-colors flex-shrink-0" />
@@ -145,7 +147,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({ onSelect }) => {
                 ) : (
                   <div className="p-8 text-center text-text-secondary">
                     <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>Начните вводить запрос для поиска</p>
+                    <p>{t('search.startTyping')}</p>
                   </div>
                 )}
               </div>

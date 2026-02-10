@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { Block, Page, Workspace, NewBlock, Comment, PageTemplate, SearchResult, SearchMatch, AppSnapshot } from '../types';
 import { serializeState, deserializeState, cloneState } from '../utils/serialization';
 import { offlineStorage } from '../services/offlineStorage';
+import { t } from '../i18n';
 
 interface HistoryState {
   past: string[];
@@ -42,6 +43,72 @@ interface AppState {
   initializeOffline: () => Promise<void>;
   saveToOffline: () => Promise<void>;
   forceSync: () => Promise<void>;
+  updateTemplates: () => void;
+}
+
+function getTemplates(): PageTemplate[] {
+  return [
+    {
+      id: 'blank',
+      name: t('templates.blank'),
+      description: t('templates.blankDesc'),
+      icon: '📄',
+      category: 'personal',
+      blocks: [],
+    },
+    {
+      id: 'meeting-notes',
+      name: t('templates.meetingNotes'),
+      description: t('templates.meetingNotesDesc'),
+      icon: '📋',
+      category: 'work',
+      blocks: [
+        { type: 'heading', content: t('templates.agenda') },
+        { type: 'text', content: `${t('templates.item')} 1` },
+        { type: 'text', content: `${t('templates.item')} 2` },
+        { type: 'heading', content: t('templates.discussion') },
+        { type: 'text', content: t('templates.keyPoints') },
+      ],
+    },
+    {
+      id: 'project-plan',
+      name: t('templates.projectPlan'),
+      description: t('templates.projectPlanDesc'),
+      icon: '🚀',
+      category: 'project',
+      blocks: [
+        { type: 'heading', content: t('templates.projectGoals') },
+        { type: 'text', content: t('templates.mainGoal') },
+        { type: 'heading', content: t('templates.tasks') },
+        { type: 'todo', content: `${t('templates.task')} 1` },
+        { type: 'todo', content: `${t('templates.task')} 2` },
+      ],
+    },
+    {
+      id: 'weekly-plan',
+      name: t('templates.weeklyPlan'),
+      description: t('templates.weeklyPlanDesc'),
+      icon: '📅',
+      category: 'personal',
+      blocks: [
+        { type: 'heading', content: t('templates.monday') },
+        { type: 'todo', content: '' },
+        { type: 'heading', content: t('templates.tuesday') },
+        { type: 'todo', content: '' },
+      ],
+    },
+    {
+      id: 'learning-notes',
+      name: t('templates.learningNotes'),
+      description: t('templates.learningNotesDesc'),
+      icon: '📚',
+      category: 'education',
+      blocks: [
+        { type: 'heading', content: t('templates.learningTopic') },
+        { type: 'text', content: '' },
+      ],
+    },
+  ];
 }
 
 function findPageInWorkspaces(workspaces: Workspace[], pageId: string): Page | null {
@@ -96,128 +163,9 @@ export const useStore = create<AppState>()(
       sidebarOpen: initialSnapshot.sidebarOpen,
       history: initialHistory,
       offlineStatus: { isOnline: navigator.onLine, hasData: false },
-      templates: [
-        {
-          id: 'blank',
-          name: 'Чистая страница',
-          description: 'Начните с чистого листа',
-          icon: '📄',
-          category: 'personal',
-          blocks: [],
-        },
-        {
-          id: 'meeting-notes',
-          name: 'Заметки с встречи',
-          description: 'Структура для ведения минут встреч',
-          icon: '📋',
-          category: 'work',
-          blocks: [
-            {
-              type: 'heading',
-              content: 'Повестка дня',
-            },
-            {
-              type: 'bullet',
-              content: 'Пункт 1',
-            },
-            {
-              type: 'bullet',
-              content: 'Пункт 2',
-            },
-            {
-              type: 'heading',
-              content: 'Обсуждение',
-            },
-            {
-              type: 'paragraph',
-              content: 'Ключевые моменты обсуждения...',
-            },
-          ],
-        },
-        {
-          id: 'project-plan',
-          name: 'План проекта',
-          description: 'Структура для планирования проекта',
-          icon: '🚀',
-          category: 'project',
-          blocks: [
-            {
-              type: 'heading',
-              content: 'Цели проекта',
-            },
-            {
-              type: 'bullet',
-              content: 'Основная цель',
-            },
-            {
-              type: 'heading',
-              content: 'Задачи',
-            },
-            {
-              type: 'todo',
-              content: 'Задача 1',
-            },
-            {
-              type: 'todo',
-              content: 'Задача 2',
-            },
-          ],
-        },
-        {
-          id: 'weekly-plan',
-          name: 'Недельный план',
-          description: 'Планирование на неделю',
-          icon: '📅',
-          category: 'personal',
-          blocks: [
-            {
-              type: 'heading',
-              content: 'Понедельник',
-            },
-            {
-              type: 'todo',
-              content: '',
-            },
-            {
-              type: 'heading',
-              content: 'Вторник',
-            },
-            {
-              type: 'todo',
-              content: '',
-            },
-          ],
-        },
-        {
-          id: 'learning-notes',
-          name: 'Конспект обучения',
-          description: 'Структура для ведения конспектов',
-          icon: '📚',
-          category: 'education',
-          blocks: [
-            {
-              type: 'heading',
-              content: 'Тема обучения',
-            },
-            {
-              type: 'heading',
-              content: 'Ключевые моменты',
-            },
-            {
-              type: 'bullet',
-              content: 'Основная концепция 1',
-            },
-            {
-              type: 'bullet',
-              content: 'Основная концепция 2',
-            },
-            {
-              type: 'heading',
-              content: 'Выводы',
-            },
-          ],
-        },
-      ],
+      templates: getTemplates(),
+
+      setSidebarOpen: (open: boolean) => set({ sidebarOpen: open }),
 
       initializeOffline: async () => {
         try {
@@ -265,9 +213,12 @@ export const useStore = create<AppState>()(
         const snapshot = getFullAppSnapshot(state);
         const serializedState = serializeState(snapshot);
         
+        const newPast = [...state.history.past, state.history.present];
+        const trimmedPast = newPast.length > 50 ? newPast.slice(-50) : newPast;
+        
         set({
           history: {
-            past: [...state.history.past, state.history.present],
+            past: trimmedPast,
             present: serializedState,
             future: []
           }
@@ -297,7 +248,7 @@ export const useStore = create<AppState>()(
           }
         });
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       redo: () => {
@@ -323,7 +274,7 @@ export const useStore = create<AppState>()(
           }
         });
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       canUndo: () => {
@@ -334,8 +285,6 @@ export const useStore = create<AppState>()(
         return get().history.future.length > 0;
       },
 
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
-
       setCurrentPage: (pageId) => {
         const state = get();
         const page = findPageInWorkspaces(state.workspaces, pageId);
@@ -343,8 +292,7 @@ export const useStore = create<AppState>()(
       },
 
       createPage: (workspaceId, page) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         const newPage: Page = {
           ...page,
@@ -364,14 +312,13 @@ export const useStore = create<AppState>()(
           currentWorkspace: state.workspaces.find(w => w.id === workspaceId) || state.currentWorkspace,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
 
         return newPage.id;
       },
 
       updatePage: (pageId, updates) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
         
         set((state) => ({
           workspaces: state.workspaces.map(workspace => ({
@@ -397,14 +344,18 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       deletePage: (pageId) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         set((state) => {
+          // Find the workspace that contains the page BEFORE deletion
+          const workspaceWithPage = state.workspaces.find(w => 
+            w.pages.some(p => p.id === pageId)
+          );
+
           const newWorkspaces = state.workspaces.map(workspace => ({
             ...workspace,
             pages: workspace.pages.filter(page => page.id !== pageId),
@@ -413,10 +364,12 @@ export const useStore = create<AppState>()(
           let newCurrentPage = state.currentPage;
 
           if (state.currentPage?.id === pageId) {
-            const currentWorkspace = newWorkspaces.find(w => 
-              w.pages.some(p => p.id === pageId)
-            ) || newWorkspaces[0];
-            newCurrentPage = currentWorkspace?.pages[0] || null;
+            // Find the updated workspace after deletion
+            const updatedWorkspace = workspaceWithPage 
+              ? newWorkspaces.find(w => w.id === workspaceWithPage.id)
+              : newWorkspaces[0];
+            
+            newCurrentPage = updatedWorkspace?.pages[0] || null;
             if (!newCurrentPage && newWorkspaces.length > 0) {
               const firstWorkspaceWithPages = newWorkspaces.find(w => w.pages.length > 0);
               newCurrentPage = firstWorkspaceWithPages?.pages[0] || null;
@@ -430,12 +383,11 @@ export const useStore = create<AppState>()(
           };
         });
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       createBlock: (pageId, block) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         const newBlock: Block = {
           ...block,
@@ -467,12 +419,11 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       updateBlock: (blockId, updates) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         set((state) => ({
           workspaces: state.workspaces.map(workspace => ({
@@ -510,12 +461,11 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       deleteBlock: (blockId) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         set((state) => ({
           workspaces: state.workspaces.map(workspace => ({
@@ -535,12 +485,11 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       moveBlock: (blockId: string, newIndex: number) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         set((state) => {
           if (!state.currentPage) return state;
@@ -569,12 +518,11 @@ export const useStore = create<AppState>()(
           };
         });
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       addComment: (blockId, content, userId = 'user1', userName = 'Current User') => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         const newComment: Comment = {
           id: crypto.randomUUID(),
@@ -618,12 +566,11 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       updateComment: (commentId, updates) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         set((state) => ({
           workspaces: state.workspaces.map(workspace => ({
@@ -655,12 +602,11 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       deleteComment: (commentId) => {
-        const state = get();
-        state.captureHistory();
+        get().captureHistory();
 
         set((state) => ({
           workspaces: state.workspaces.map(workspace => ({
@@ -684,7 +630,7 @@ export const useStore = create<AppState>()(
             : state.currentPage,
         }));
 
-        state.saveToOffline();
+        get().saveToOffline();
       },
 
       resolveComment: (commentId) => {
@@ -704,17 +650,22 @@ export const useStore = create<AppState>()(
         if (!query.trim()) return results;
 
         const searchTerm = query.toLowerCase();
+        const seen = new Set<string>();
         
-        state.workspaces.forEach(workspace => {
-          workspace.pages.forEach(page => {
-            page.blocks.forEach(block => {
-              const searchInBlock = (block: Block, path: string = '') => {
+        for (const workspace of state.workspaces) {
+          for (const page of workspace.pages) {
+            for (const block of page.blocks) {
+              const searchInBlock = (block: Block) => {
                 const content = block.content.toLowerCase();
                 if (content.includes(searchTerm)) {
+                  const key = `${page.id}-${block.id}`;
+                  if (seen.has(key)) return;
+                  seen.add(key);
+
                   const matches: SearchMatch[] = [];
                   let startIndex = 0;
                   
-                  while ((startIndex = content.indexOf(searchTerm, startIndex)) !== -1) {
+                  while ((startIndex = content.indexOf(searchTerm, startIndex)) !== -1 && matches.length < 10) {
                     matches.push({
                       text: block.content.substring(startIndex, startIndex + searchTerm.length),
                       start: startIndex,
@@ -731,17 +682,23 @@ export const useStore = create<AppState>()(
                     content: block.content,
                     matches,
                   });
+
+                  if (results.length >= 100) return;
                 }
                 
-                block.children.forEach((child, index) => {
-                  searchInBlock(child, `${path} > ${index}`);
-                });
+                for (const child of block.children) {
+                  searchInBlock(child);
+                  if (results.length >= 100) return;
+                }
               };
               
               searchInBlock(block);
-            });
-          });
-        });
+              if (results.length >= 100) break;
+            }
+            if (results.length >= 100) break;
+          }
+          if (results.length >= 100) break;
+        }
         
         return results;
       },
@@ -767,6 +724,10 @@ export const useStore = create<AppState>()(
           icon: template.icon,
           blocks: blocks,
         });
+      },
+
+      updateTemplates: () => {
+        set({ templates: getTemplates() });
       },
     };
   })

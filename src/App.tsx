@@ -6,7 +6,8 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTheme, applyThemeToDocument } from './hooks/useTheme';
 import { ThemeToggle } from './components/theme/ThemeToggle';
 import { EnhancedSearch } from './components/comments/search/EnhancedSearch';
-import { OfflineStatus } from './components/ui/OfflineStatus';
+import { LanguageSwitcher } from './components/ui/LanguageSwitcher';
+import { t } from './i18n';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Menu } from 'lucide-react';
 
@@ -36,12 +37,12 @@ function App() {
         const ws = useStore.getState().workspaces;
         if (ws.length > 0 && ws[0].pages.length === 0) {
           createPage('default', {
-            title: 'Welcome to Notion Clone',
+            title: t('app.welcomeTitle'),
             blocks: [
               {
                 id: crypto.randomUUID(),
                 type: 'text',
-                content: 'This is a simple text block. Click to edit!',
+                content: t('app.welcomeText'),
                 children: [],
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -49,7 +50,7 @@ function App() {
               {
                 id: crypto.randomUUID(),
                 type: 'heading',
-                content: 'This is a heading',
+                content: t('app.welcomeHeading'),
                 children: [],
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -67,7 +68,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="flex h-screen bg-background safe-area-inset">
           {open && (
             <div className="hidden lg:block w-80 flex-shrink-0">
@@ -98,7 +99,7 @@ function App() {
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 mt-3 lg:mt-0.5">
-                <OfflineStatus />
+                <LanguageSwitcher />
                 <ThemeToggle />
               </div>
             </div>

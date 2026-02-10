@@ -39,7 +39,7 @@ export const DraggableBlock = ({ block, children, index }: DraggableBlockProps) 
           onClick={handleDelete}
           className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-200 rounded transition-all"
         >
-          <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500 transition-colors" />
+          <Trash2 className="w-4 h-4 text-gray-500 transition-colors" />
         </button>
       </div>
     </div>

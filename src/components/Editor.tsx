@@ -13,8 +13,10 @@ import { formatDate } from '../utils/dateUtils';
 import { GoogleDriveManager } from './google/GoogleDriveManager';
 import { Modal } from './ui/Modal';
 import { UndoRedo } from './ui/UndoRedo';
+import { useI18n } from '../hooks/useI18n';
 
 export const Editor = () => {
+  const { t } = useI18n();
   const { currentPage: page, updatePage, createBlock, moveBlock, deleteBlock } = useStore();
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState('');
@@ -41,13 +43,13 @@ export const Editor = () => {
   }, [editing]);
 
   useEffect(() => {
-    const click = (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setShowMenu(false);
       }
     };
-    document.addEventListener('mousedown', click);
-    return () => document.removeEventListener('mousedown', click);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   const saveTitle = () => {
@@ -62,7 +64,12 @@ export const Editor = () => {
 
   const addBlock = (type: 'text' | 'heading' | 'todo' | 'quote') => {
     if (!page) return;
-    const content = { text: '', heading: 'Новый заголовок', todo: 'To Do', quote: 'Цитата' };
+    const content = { 
+      text: '', 
+      heading: t('blocks.newHeading'), 
+      todo: t('blocks.todoItem'), 
+      quote: t('blocks.quotePlaceholder') 
+    };
     createBlock(page.id, { type, content: content[type] });
     setShowMenu(false);
   };
@@ -110,10 +117,10 @@ export const Editor = () => {
   };
 
   const types = [
-    { type: 'text' as const, icon: Type, label: 'Текст' },
-    { type: 'heading' as const, icon: Heading1, label: 'Заголовок' },
-    { type: 'todo' as const, icon: List, label: 'To Do' },
-    { type: 'quote' as const, icon: Quote, label: 'Цитата' },
+    { type: 'text' as const, icon: Type, label: t('blocks.text') },
+    { type: 'heading' as const, icon: Heading1, label: t('blocks.heading') },
+    { type: 'todo' as const, icon: List, label: t('blocks.todo') },
+    { type: 'quote' as const, icon: Quote, label: t('blocks.quote') },
   ];
 
   if (!page) {
@@ -123,8 +130,8 @@ export const Editor = () => {
           <div className="w-16 h-16 bg-hover rounded-lg mx-auto mb-4 flex items-center justify-center">
             <Plus className="w-8 h-8 text-text-secondary" />
           </div>
-          <h2 className="text-xl font-bold text-text mb-2">Страница не выбрана</h2>
-          <p className="text-text-secondary text-sm">Выберите страницу на боковой панели или создайте новую</p>
+          <h2 className="text-xl font-bold text-text mb-2">{t('editor.noPageSelected')}</h2>
+          <p className="text-text-secondary text-sm">{t('editor.selectOrCreate')}</p>
         </div>
       </div>
     );
@@ -138,7 +145,7 @@ export const Editor = () => {
             <UndoRedo />
             <div className="flex items-center gap-2">
               <GoogleDriveManager />
-              <button onClick={exportPage} className="flex items-center gap-1 px-2 py-2 bg-accent text-white rounded-lg text-sm hover:opacity-90 transition-colors shadow-sm special-theme-button" title="Экспорт">
+              <button onClick={exportPage} className="flex items-center gap-1 px-2 py-2 bg-accent text-white rounded-lg text-sm hover:opacity-90 transition-colors shadow-sm special-theme-button" title={t('editor.exportPage')}>
                 <Download className="w-4 h-4" />
               </button>
             </div>
@@ -150,7 +157,7 @@ export const Editor = () => {
           <div className="flex gap-2 flex-wrap">
             <GoogleDriveManager />
             <button onClick={exportPage} className="flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button">
-              <Download className="w-4 h-4" /><span>Экспорт страницы</span>
+              <Download className="w-4 h-4" /><span>{t('editor.exportPage')}</span>
             </button>
           </div>
         </div>
@@ -163,14 +170,14 @@ export const Editor = () => {
           <div className="text-3xl sm:text-3xl lg:text-4xl mt-1 flex-shrink-0">{page.icon || '📄'}</div>
           <div className="flex-1 min-w-0">
             {editing ? (
-              <textarea ref={titleRef} value={title} onChange={(e) => setTitle(e.target.value)} onBlur={saveTitle} onKeyDown={keyDown} className="w-full text-2xl sm:text-2xl lg:text-4xl font-bold resize-none border-none outline-none bg-transparent leading-tight text-text placeholder-text-secondary" style={{ minHeight: '1.5em' }} rows={1} placeholder="Untitled" />
+              <textarea ref={titleRef} value={title} onChange={(e) => setTitle(e.target.value)} onBlur={saveTitle} onKeyDown={keyDown} className="w-full text-2xl sm:text-2xl lg:text-4xl font-bold resize-none border-none outline-none bg-transparent leading-tight text-text placeholder-text-secondary" style={{ minHeight: '1.5em' }} rows={1} placeholder={t('editor.untitled')} />
             ) : (
-              <h1 onClick={() => setEditing(true)} className="w-full text-2xl sm:text-2xl lg:text-4xl font-bold outline-none cursor-text hover:bg-hover rounded-lg px-3 lg:px-3 py-2 lg:py-2 -mx-3 lg:-mx-3 leading-tight text-text break-words">{page.title || 'Untitled'}</h1>
+              <h1 onClick={() => setEditing(true)} className="w-full text-2xl sm:text-2xl lg:text-4xl font-bold outline-none cursor-text hover:bg-hover rounded-lg px-3 lg:px-3 py-2 lg:py-2 -mx-3 lg:-mx-3 leading-tight text-text break-words">{page.title || t('editor.untitled')}</h1>
             )}
             <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3 text-text-secondary text-sm mt-3">
-              <span className="text-sm">Создано: {formatDate(page.createdAt)}</span>
+              <span className="text-sm">{t('editor.created')}: {formatDate(page.createdAt)}</span>
               <span className="hidden xs:inline">•</span>
-              <span className="text-sm">Обновлено: {formatDate(page.updatedAt)}</span>
+              <span className="text-sm">{t('editor.updated')}: {formatDate(page.updatedAt)}</span>
             </div>
           </div>
         </div>
@@ -179,18 +186,16 @@ export const Editor = () => {
           <DndContext collisionDetection={closestCenter} onDragStart={dragStart} onDragEnd={dragEnd}>
             <div ref={setNodeRef}>
               <SortableContext items={page.blocks.map(b => b.id)} strategy={verticalListSortingStrategy}>
-                <AnimatePresence>
-                  {page.blocks.map((b, i) => (
-                    <div key={b.id}>
-                      <SortableBlock key={b.id} block={b} index={i} isDragging={dragId === b.id} onDeleteClick={openDel}>
-                        {b.type === 'text' && <TextBlock block={b} />}
-                        {b.type === 'heading' && <HeaderBlock block={b} level={1} />}
-                        {b.type === 'todo' && <TodoBlock block={b} />}
-                        {b.type === 'quote' && <QuoteBlock block={b} />}
-                      </SortableBlock>
-                    </div>
-                  ))}
-                </AnimatePresence>
+                {page.blocks.map((b, i) => (
+                  <div key={b.id}>
+                    <SortableBlock block={b} index={i} isDragging={dragId === b.id} onDeleteClick={openDel}>
+                      {b.type === 'text' && <TextBlock block={b} />}
+                      {b.type === 'heading' && <HeaderBlock block={b} level={1} />}
+                      {b.type === 'todo' && <TodoBlock block={b} />}
+                      {b.type === 'quote' && <QuoteBlock block={b} />}
+                    </SortableBlock>
+                  </div>
+                ))}
               </SortableContext>
             </div>
           </DndContext>
@@ -198,16 +203,20 @@ export const Editor = () => {
 
         <div className="relative" ref={menuRef}>
           {showMenu ? (
-            <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 lg:gap-2 p-3 lg:p-4 bg-hover rounded-lg border border-border mb-3 lg:mb-4">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 lg:gap-2 p-3 lg:p-4 bg-hover rounded-lg border border-border mb-3 lg:mb-4 animate-fade-in">
               {types.map(({ type, icon: Icon, label }) => (
-                <button key={type} onClick={() => addBlock(type)} className="flex items-center gap-2 xs:gap-2 lg:gap-3 p-2 lg:p-3 bg-background rounded-lg border border-border text-text hover:border-accent transition-colors text-sm">
+                <button 
+                  key={type} 
+                  onClick={() => addBlock(type)} 
+                  className="flex items-center gap-2 xs:gap-2 lg:gap-3 p-2 lg:p-3 bg-background rounded-lg border border-border text-text hover:border-accent transition-colors text-sm"
+                >
                   <Icon className="w-4 h-4 flex-shrink-0" /><span className="font-medium text-sm">{label}</span>
                 </button>
               ))}
             </div>
           ) : (
-            <button onClick={() => setShowMenu(true)} className="w-full p-3 border-2 border-dashed border-border rounded-lg text-text-secondary hover:text-text hover:border-accent transition-colors flex items-center justify-center gap-2 hover:bg-hover text-xs">
-              <Plus className="w-3 h-3" /><span className="font-medium">Добавить блок</span>
+            <button onClick={() => setShowMenu(true)} className="w-full p-4 lg:p-5 border-2 border-dashed border-border rounded-lg text-text-secondary hover:text-text hover:border-accent transition-colors flex items-center justify-center gap-2 hover:bg-hover text-sm lg:text-base">
+              <Plus className="w-5 h-5 lg:w-6 lg:h-6" /><span className="font-medium">{t('editor.addBlock')}</span>
             </button>
           )}
         </div>
@@ -215,14 +224,14 @@ export const Editor = () => {
         {page.blocks.length === 0 && !showMenu && (
           <div className="text-center py-6 lg:py-12 px-4">
             <div className="mb-3 lg:mb-4">
-              <button onClick={() => setShowMenu(true)} className="px-3 py-2 lg:px-4 lg:py-3 bg-accent text-white rounded-lg text-xs lg:text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button">+ Создайте свой первый блок</button>
+              <button onClick={() => setShowMenu(true)} className="px-3 py-2 lg:px-4 lg:py-3 bg-accent text-white rounded-lg text-xs lg:text-sm font-medium hover:opacity-90 transition-colors shadow-sm special-theme-button">+ {t('editor.createFirstBlock')}</button>
             </div>
-            <p className="text-text-secondary text-xs">Начните создавать свою страницу с помощью блоков контента</p>
+            <p className="text-text-secondary text-xs">{t('editor.startCreating')}</p>
           </div>
         )}
       </div>
 
-      <Modal isOpen={showDel} onClose={closeDel} onConfirm={confirmDel} title={`Удалить ${delText}?`} confirmText="Удалить" type="delete" />
+      <Modal isOpen={showDel} onClose={closeDel} onConfirm={confirmDel} title={`${t('common.delete')} ${delText}?`} confirmText={t('common.delete')} type="delete" />
     </div>
   );
 };

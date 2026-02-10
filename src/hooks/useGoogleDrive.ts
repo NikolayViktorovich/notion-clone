@@ -56,7 +56,6 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
       }
 
       const redirectUri = getRedirectUri();
-
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({
         client_id: GOOGLE_DRIVE_CONFIG.clientId,
         redirect_uri: redirectUri,
@@ -67,11 +66,7 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
         prompt: 'consent',
       })}`;
 
-      const authWindow = window.open(
-        authUrl, 
-        'google-auth', 
-        'width=600,height=700,left=100,top=100'
-      );
+      const authWindow = window.open(authUrl, 'google-auth', 'width=600,height=700,left=100,top=100');
       
       if (!authWindow) {
         throw new Error('Popup window blocked. Please allow popups for this site.');
@@ -79,7 +74,7 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
 
       const accessToken = await new Promise<string>((resolve, reject) => {
         const messageHandler = (event: MessageEvent) => {
-          if (event.origin !== window.location.origin) return;
+          if (event.origin !== window.location.origin || event.source !== authWindow) return;
           
           if (event.data.type === 'google-auth-success' && event.data.token) {
             window.removeEventListener('message', messageHandler);
@@ -108,14 +103,11 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
 
       try {
         const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
+          headers: { 'Authorization': `Bearer ${accessToken}` },
         });
 
         if (userInfoResponse.ok) {
           const userInfo = await userInfoResponse.json();
-          
           userData = {
             email: userInfo.email || 'user@google.com',
             name: userInfo.name || 'Google User',
@@ -123,14 +115,11 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
           };
         } else {
           const driveResponse = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
+            headers: { 'Authorization': `Bearer ${accessToken}` },
           });
 
           if (driveResponse.ok) {
             const aboutData = await driveResponse.json();
-            
             userData = {
               email: aboutData.user?.emailAddress || 'user@google.com',
               name: aboutData.user?.displayName || 'Google User',
@@ -256,25 +245,33 @@ export const useGoogleDrive = create<GoogleDriveState>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
+      const metaResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=size,mimeType`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Google Drive API error:', response.status, errorText);
-        
-        if (response.status === 401) {
+      if (!metaResponse.ok) {
+        if (metaResponse.status === 401) {
           get().signOut();
           throw new Error('Session expired. Please sign in again.');
         }
-        
-        if (response.status === 404) {
+        if (metaResponse.status === 404) {
           throw new Error('File not found in Google Drive');
         }
-        
+        throw new Error(`Failed to load file: ${metaResponse.status} ${metaResponse.statusText}`);
+      }
+
+      const metadata = await metaResponse.json();
+      const fileSize = parseInt(metadata.size || '0', 10);
+      
+      if (fileSize > 10 * 1024 * 1024) {
+        throw new Error('File too large (max 10MB)');
+      }
+
+      const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
         throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
       }
 

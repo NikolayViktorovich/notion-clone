@@ -1,8 +1,10 @@
 import { Undo2, Redo2 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import { useI18n } from '../../hooks/useI18n';
 
 export const UndoRedo = () => {
   const { undo, redo, canUndo, canRedo } = useStore();
+  const { t } = useI18n();
 
   const handleUndo = () => {
     if (canUndo()) undo();
@@ -22,7 +24,7 @@ export const UndoRedo = () => {
             ? 'hover:bg-hover hover:border-border text-text' 
             : 'text-text-secondary cursor-not-allowed'
         }`}
-        title="Undo (Ctrl+Z)"
+        title={t('undoRedo.undo')}
       >
         <Undo2 className="w-4 h-4" />
       </button>
@@ -37,7 +39,7 @@ export const UndoRedo = () => {
             ? 'hover:bg-hover hover:border-border text-text' 
             : 'text-text-secondary cursor-not-allowed'
         }`}
-        title="Redo (Ctrl+Y)"
+        title={t('undoRedo.redo')}
       >
         <Redo2 className="w-4 h-4" />
       </button>

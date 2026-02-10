@@ -6,12 +6,14 @@ import { useStore } from '../../store/useStore';
 import { InputModal } from '../ui/InputModal';
 import { Notification } from '../ui/Notification';
 import { useNotification } from '../../hooks/useNotification';
+import { useI18n } from '../../hooks/useI18n';
 
 export const GoogleDriveManager = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
   const [saveModal, setSaveModal] = useState(false);
   const [fileName, setFileName] = useState('');
+  const { t } = useI18n();
   
   const { currentPage } = useStore();
   const {
@@ -46,26 +48,26 @@ export const GoogleDriveManager = () => {
       setSaveModal(false);
       setFileName('');
       
-      notifySuccess(`Страница "${fileName}" успешно сохранена в Google Drive!`);
+      notifySuccess(`${t('googleDrive.saveTitle')} "${fileName}"!`);
 
     } catch (error) {
       console.error('Error saving to Google Drive:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      notifyError(`Ошибка при сохранении: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : t('common.error');
+      notifyError(`${t('common.error')}: ${errorMessage}`);
     }
   };
 
   const handleLoadFromDrive = async (fileId: string) => {
     try {
       const content = await loadFromDrive(fileId);
-      JSON.parse(content); // Validate JSON format
+      JSON.parse(content);
       
-      notifySuccess('Страница загружена из Google Drive!');
+      notifySuccess(t('googleDrive.saveTitle'));
       
     } catch (error) {
       console.error('Error loading from Google Drive:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      notifyError(`Ошибка при загрузке: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : t('common.error');
+      notifyError(`${t('common.error')}: ${errorMessage}`);
     }
   };
 
@@ -73,37 +75,37 @@ export const GoogleDriveManager = () => {
     try {
       await listFiles();
       setShowFiles(true);
-      notifyInfo('Список файлов обновлен');
+      notifyInfo(t('googleDrive.recentFiles'));
     } catch (error) {
       console.error('Error listing files:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      notifyError(`Ошибка при загрузке списка файлов: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : t('common.error');
+      notifyError(`${t('common.error')}: ${errorMessage}`);
     }
   };
 
   const handleSignIn = async () => {
     try {
       await signIn();
-      notifySuccess('Успешный вход в Google Drive!');
+      notifySuccess(t('googleDrive.signIn'));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      notifyError(`Ошибка входа: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : t('common.error');
+      notifyError(`${t('common.error')}: ${errorMessage}`);
     }
   };
 
   const handleSignOut = () => {
     signOut();
-    notifyInfo('Выход из Google Drive выполнен');
+    notifyInfo(t('googleDrive.signOut'));
   };
 
   const handleDeleteFile = async (fileId: string, fileName: string) => {
     try {
       await deleteFromDrive(fileId);
-      notifySuccess(`Файл "${fileName}" удален из Google Drive`);
+      notifySuccess(`${t('common.delete')} "${fileName}"`);
     } catch (error) {
       console.error('Error deleting file:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      notifyError(`Ошибка при удалении: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : t('common.error');
+      notifyError(`${t('common.error')}: ${errorMessage}`);
     }
   };
 
@@ -122,7 +124,7 @@ export const GoogleDriveManager = () => {
         className="flex items-center gap-2 px-4 py-2 bg-hover rounded-lg text-sm font-medium transition-colors border border-border hover:bg-border text-text"
       >
         <Cloud className="w-4 h-4" />
-        Google Drive
+        {t('googleDrive.title')}
       </button>
 
       <AnimatePresence>
@@ -141,10 +143,10 @@ export const GoogleDriveManager = () => {
                   <div className="text-center">
                     <Cloud className="w-12 h-12 mx-auto mb-2 text-text-secondary" />
                     <h3 className="font-semibold text-text mb-1">
-                      Google Drive
+                      {t('googleDrive.title')}
                     </h3>
                     <p className="text-sm text-text-secondary">
-                      Войдите в аккаунт Google для синхронизации
+                      {t('googleDrive.signInPrompt')}
                     </p>
                   </div>
                   
@@ -158,7 +160,7 @@ export const GoogleDriveManager = () => {
                     ) : (
                       <User className="w-4 h-4" />
                     )}
-                    Войти в Google
+                    {t('googleDrive.signIn')}
                   </button>
                 </div>
               ) : (
@@ -196,7 +198,7 @@ export const GoogleDriveManager = () => {
                       className="w-full flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg text-sm text-text hover:bg-hover transition-colors disabled:opacity-50"
                     >
                       <Upload className="w-4 h-4" />
-                      Сохранить текущую страницу
+                      {t('googleDrive.saveCurrentPage')}
                     </button>
 
                     <button
@@ -205,19 +207,19 @@ export const GoogleDriveManager = () => {
                       className="w-full flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg text-sm text-text hover:bg-hover transition-colors disabled:opacity-50"
                     >
                       <FileText className="w-4 h-4" />
-                      Мои файлы в Drive
+                      {t('googleDrive.myFiles')}
                     </button>
                   </div>
 
                   {showFiles && (
                     <div className="border-t border-border pt-3">
                       <h4 className="text-sm font-medium text-text mb-2">
-                        Последние файлы
+                        {t('googleDrive.recentFiles')}
                       </h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
                         {files.length === 0 ? (
                           <p className="text-sm text-text-secondary text-center py-4">
-                            Файлы не найдены
+                            {t('googleDrive.noFiles')}
                           </p>
                         ) : (
                           files.map((file) => (
@@ -238,21 +240,21 @@ export const GoogleDriveManager = () => {
                                 <button
                                   onClick={() => handleLoadFromDrive(file.id)}
                                   className="p-1 text-text-secondary hover:text-text transition-colors"
-                                  title="Загрузить"
+                                  title={t('googleDrive.loadTooltip')}
                                 >
                                   <Download className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => window.open(file.webViewLink, '_blank')}
                                   className="p-1 text-text-secondary hover:text-text transition-colors"
-                                  title="Открыть в Drive"
+                                  title={t('googleDrive.openInDrive')}
                                 >
                                   <ExternalLink className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteFile(file.id, file.name)}
-                                  className="p-1 text-text-secondary hover:text-red-600 transition-colors"
-                                  title="Удалить"
+                                  className="p-1 text-text-secondary hover:text-text transition-colors"
+                                  title={t('googleDrive.deleteTooltip')}
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -277,10 +279,10 @@ export const GoogleDriveManager = () => {
           setFileName('');
         }}
         onConfirm={handleSaveToDrive}
-        title="Сохранить в Google Drive"
-        description="Введите название файла для сохранения в Google Drive"
-        confirmText="Сохранить"
-        placeholder="Название страницы"
+        title={t('googleDrive.saveTitle')}
+        description={t('googleDrive.saveDescription')}
+        confirmText={t('googleDrive.saveButton')}
+        placeholder={t('modal.pageName')}
         value={fileName}
         onChange={setFileName}
       />

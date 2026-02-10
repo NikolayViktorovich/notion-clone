@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Block } from '../../types';
 import { GripVertical, Trash2 } from 'lucide-react';
+import { useI18n } from '../../hooks/useI18n';
 
 interface SortableBlockProps {
   block: Block;
@@ -18,6 +19,7 @@ export const SortableBlock = ({
   isDragging = false,
   onDeleteClick 
 }: SortableBlockProps) => {
+  const { t } = useI18n();
   const {
     attributes,
     listeners,
@@ -34,10 +36,10 @@ export const SortableBlock = ({
 
   const handleDeleteClick = () => {
     const blockTypeNames: { [key: string]: string } = {
-      'text': 'текстовый блок',
-      'heading': 'заголовок',
-      'todo': 'задачу',
-      'quote': 'цитату'
+      'text': t('blocks.text').toLowerCase(),
+      'heading': t('blocks.heading').toLowerCase(),
+      'todo': t('blocks.todo').toLowerCase(),
+      'quote': t('blocks.quote').toLowerCase()
     };
     
     const blockTypeName = blockTypeNames[block.type] || block.type;
@@ -67,7 +69,7 @@ export const SortableBlock = ({
           onClick={handleDeleteClick}
           className="opacity-0 group-hover:opacity-100 p-2 hover:bg-border rounded transition-opacity"
         >
-          <Trash2 className="w-4 h-4 text-text-secondary hover:text-red-500 transition-colors" />
+          <Trash2 className="w-4 h-4 text-text-secondary transition-colors" />
         </button>
       </div>
     </div>
