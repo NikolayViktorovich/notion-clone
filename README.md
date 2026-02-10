@@ -2,7 +2,7 @@
 
 Современный блочный редактор с поддержкой drag & drop, тем оформления и Google Drive интеграции.
 
-![Notion Clone](https://i.postimg.cc/fyb1LMY5/notionclone.png)
+![Notion Clone](https://i.postimg.cc/FHGxYWhM/Snimok-ekrana-2026-02-10-v-17-02-15.png)
 
 **[Live Demo](https://notion-clone-chi-seven.vercel.app/)**
 
